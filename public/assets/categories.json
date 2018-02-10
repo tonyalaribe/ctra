@@ -1,0 +1,62 @@
+[
+  {
+  "Slug":"women-s-shoes-clothing-accessories",
+  "Name":"WOMEN'S SHOES, CLOTHING & ACCESSORIES"
+  },
+  {
+  "Slug":"men-s-shoes-clothing-accessories",
+  "Name":"MEN'S SHOES, CLOTHING & ACCESSORIES"
+  },
+  {
+  "Slug":"mobile-phones-tablets-accessories",
+  "Name":"MOBILE PHONES, TABLETS & ACCESSORIES"
+  },
+  {
+  "Slug":"watches-and-sunglasses",
+  "Name":"WATCHES AND SUNGLASSES"
+  },
+  {
+  "Slug":"baby-kids-toys",
+  "Name":"BABY, KIDS & TOYS"
+  },
+  {
+  "Slug":"groceries-kitchen-items",
+  "Name":"GROCERIES & KITCHEN ITEMS"
+  },
+  {
+  "Slug":"laptops-desktops-and-computer-accessories",
+  "Name":"LAPTOPS, DESKTOPS & COMPUTER ACCESSORIES"
+  },
+  {
+  "Slug":"home-and-office-furniture-and-appliances",
+  "Name":"HOME & OFFICE FURNITURE & APPLIANCES"
+  },
+  {
+  "Slug":"electronics",
+  "Name":"ELECTRONICS"
+  },
+  {
+  "Slug":"beauty-and-health",
+  "Name":"BEAUTY & HEALTH"
+  },
+  {
+  "Slug":"gaming",
+  "Name":"GAMING"
+  },
+  {
+  "Slug":"software",
+  "Name":"SOFTWARE"
+  },
+  {
+  "Slug":"automobile",
+  "Name":"AUTOMOBILE"
+  },
+  {
+  "Slug":"books-movies-and-music",
+  "Name":"BOOKS, MOVIES AND MUSIC"
+  },
+  {
+  "Slug":"sports-and-fitness",
+  "Name":"SPORTS AND FITNESS"
+  }
+]

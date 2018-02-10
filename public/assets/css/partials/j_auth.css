@@ -1,0 +1,129 @@
+.or::before {
+    content: '' !important;
+    position: absolute !important;
+    border-bottom: 1px solid #e4e4e4 !important;
+    top: 50% !important;
+    width: 5000px !important;
+    right: 100% !important;
+}
+
+.or::after {
+    content: '' !important;
+    position: absolute !important;
+    border-bottom: 1px solid #e4e4e4 !important;
+    top: 50% !important;
+    width: 5000px !important;
+    left: 100% !important;
+}
+
+.bg-facebook-blue {
+    background-color: #4568b2;
+}
+
+.b--custom-gray {
+    border-color: rgb(118, 118, 118);
+}
+
+.bg-custom-red {
+    background-color: #FF5A5F;
+}
+
+.custom-red {
+    color: #FF5A5F;
+}
+
+.b--custom-red {
+    border-color: #FF5A5F;
+}
+
+.custom-gray {
+    color: rgb(118, 118, 118);
+}
+
+.bg-custom-gray {
+    background-color: rgb(118, 118, 118);
+}
+
+.custom-green {
+    color: #008489;
+}
+
+.bg-custom-green {
+    background-color: #008489;
+}
+
+.b--custom-green {
+    border-color: #008489;
+}
+
+.hover-bg-custom-green:hover {
+    background-color: #008489;
+}
+
+.pa-modal {
+    padding: 32px;
+}
+
+.mw-modal {
+    max-width: 568px !important;
+}
+
+.w6 {
+    width: 24rem !important;
+}
+
+.w7 {
+    width: 32rem !important;
+}
+
+.w6-ns {
+    width: 24rem !important;
+}
+
+.w7-ns {
+    width: 32rem !important;
+}
+
+@media screen and (max-width : 32rem) {
+    .w7-ns {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width : 24rem) {
+    .w7-ns {
+        width: 100%;
+    }
+    .pa-modal {
+        padding: 15px;
+    }
+}
+
+.tingle-modal-box__content {
+    padding: 0 !important;
+    /* max-width: 568px !important; */
+    display: inline-block;
+}
+
+.tingle-modal-box {
+    width: auto !important;
+    overflow: auto !important;
+    /* max-width: 568px !important; */
+}
+
+.tingle-modal {
+    overflow: auto !important;
+}
+
+.gray-placeholder::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #D3D3D3;
+}
+.gray-placeholder::-moz-placeholder { /* Firefox 19+ */
+    color: #D3D3D3;
+}
+.gray-placeholder:-ms-input-placeholder { /* IE 10+ */
+    color: #D3D3D3;
+}
+.gray-placeholder:-moz-placeholder { /* Firefox 18- */
+    color: #D3D3D3;
+}
