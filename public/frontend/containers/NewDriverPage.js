@@ -21,10 +21,10 @@ export var NewDriverPage = {
 				<div class="bg-gray cf pa3">
 					<button
 						class="fr pv2 ph3 bg-white shadow-4 "
-						onclick={() => Data.Submit()}
-					>
-						Save
-					</button>
+						onclick={function() {
+							Data.Submit();
+						}}
+					>Save</button>
 				</div>
 			</section>
 		);

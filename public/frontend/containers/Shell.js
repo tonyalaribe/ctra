@@ -1,5 +1,6 @@
 import m from "mithril";
 import flatpickr from "flatpickr";
+import {SVGIcons} from "../../shared/components/svgIcons";
 
 export var Shell = {
 	oncreate: function() {
@@ -23,12 +24,19 @@ export var Shell = {
 						</a>
 						<div class="dib pl4">
 							<span class=" dib ph2 pv2 ">search:</span>
-							<form class="dib pl3 w5">
+							<form class="dib pl3 w5 relative">
 								<input
 									type="text"
-									class="bg-white br4 bw0 pa2 w-100 f6 ph3"
+									class="bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib"
 									placeholder="form number, name, slot number, etc"
+									style="outline: none"
 								/>
+								<p class="mv0 dib w1 h1 absolute pointer" style="top: 0.5rem; right:0.5rem"
+								onclick={()=>{
+									console.log("Search button clicked")
+								}}>
+									<SVGIcons type="search"/>
+								</p>
 							</form>
 						</div>
 						<div class="dib fr pv2 ">

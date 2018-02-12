@@ -104,6 +104,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, messages.ErrInternalServer)
 		return
 	}
+	
+	// check if each field is not empty...
 
 	item.CreatedAt = time.Now()
 	item.ModifiedAt = time.Now()

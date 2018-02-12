@@ -1324,7 +1324,7 @@ m.vnode = Vnode
 if (true) module["exports"] = m
 else window.m = m
 }());
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7).setImmediate, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7).setImmediate, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
@@ -1445,6 +1445,33 @@ var TextInput = exports.TextInput = {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1507,37 +1534,10 @@ var ImageInput = exports.ImageInput = {
 };
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* flatpickr v4.2.3, @license MIT */
+/* flatpickr v4.3.2, @license MIT */
 (function (global, factory) {
 	 true ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1590,10 +1590,6 @@ function debounce(func, wait, immediate) {
 var arrayify = function (obj) {
     return obj instanceof Array ? obj : [obj];
 };
-function mouseDelta(e) {
-    var delta = e.wheelDelta || -e.deltaY;
-    return delta >= 0 ? 1 : -1;
-}
 
 var do_nothing = function () { return undefined; };
 var revFormat = {
@@ -1790,14 +1786,15 @@ var english = {
 
 var createDateFormatter = function (_a) {
     var _b = _a.config, config = _b === void 0 ? defaults : _b, _c = _a.l10n, l10n = _c === void 0 ? english : _c;
-    return function (dateObj, frmt) {
+    return function (dateObj, frmt, overrideLocale) {
         if (config.formatDate !== undefined)
             return config.formatDate(dateObj, frmt);
+        var locale = overrideLocale || l10n;
         return frmt
             .split("")
             .map(function (c, i, arr) {
             return formats[c] && arr[i - 1] !== "\\"
-                ? formats[c](dateObj, l10n, config)
+                ? formats[c](dateObj, locale, config)
                 : c !== "\\" ? c : "";
         })
             .join("");
@@ -2008,9 +2005,11 @@ if (typeof Object.assign !== "function") {
 
 var DEBOUNCED_CHANGE_MS = 300;
 function FlatpickrInstance(element, instanceConfig) {
-    var self = {};
-    self.parseDate = createDateParser(self);
-    self._animationLoop = [];
+    var self = {
+        config: __assign({}, flatpickr.defaultConfig),
+        l10n: english,
+    };
+    self.parseDate = createDateParser({ config: self.config, l10n: self.l10n });
     self._handlers = [];
     self._bind = bind;
     self._setHoursFromDate = setHoursFromDate;
@@ -2060,8 +2059,12 @@ function FlatpickrInstance(element, instanceConfig) {
         self.showTimeInput =
             self.selectedDates.length > 0 || self.config.noCalendar;
         if (self.weekWrapper !== undefined && self.daysContainer !== undefined) {
+            self.calendarContainer.style.visibility = "hidden";
+            self.calendarContainer.style.display = "block";
             self.calendarContainer.style.width =
                 self.daysContainer.offsetWidth + self.weekWrapper.offsetWidth + "px";
+            self.calendarContainer.style.visibility = "visible";
+            self.calendarContainer.style.display = null;
         }
         var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         if (!self.isMobile && isSafari) {
@@ -2202,11 +2205,10 @@ function FlatpickrInstance(element, instanceConfig) {
         }
         var debouncedResize = debounce(onResize, 50);
         self._debouncedChange = debounce(triggerChange, DEBOUNCED_CHANGE_MS);
-        if (self.config.mode === "range" &&
-            self.daysContainer &&
-            !/iPhone|iPad|iPod/i.test(navigator.userAgent))
+        if (self.daysContainer && !/iPhone|iPad|iPod/i.test(navigator.userAgent))
             bind(self.daysContainer, "mouseover", function (e) {
-                return onMouseOver(e.target);
+                if (self.config.mode === "range")
+                    onMouseOver(e.target);
             });
         bind(window.document.body, "keydown", onKeyDown);
         if (!self.config.static)
@@ -2214,22 +2216,17 @@ function FlatpickrInstance(element, instanceConfig) {
         if (!self.config.inline && !self.config.static)
             bind(window, "resize", debouncedResize);
         if (window.ontouchstart !== undefined)
-            bind(window.document.body, "touchstart", documentClick);
-        bind(window.document.body, "mousedown", onClick(documentClick));
-        bind(window.document.body, "focus", documentClick, { capture: true });
+            bind(window.document, "touchstart", documentClick);
+        bind(window.document, "mousedown", onClick(documentClick));
+        bind(window.document, "focus", documentClick, { capture: true });
         if (self.config.clickOpens === true) {
             bind(self._input, "focus", self.open);
             bind(self._input, "mousedown", onClick(self.open));
         }
         if (self.daysContainer !== undefined) {
-            bind(self.monthNav, "wheel", onMonthNavScroll);
             bind(self.monthNav, "mousedown", onClick(onMonthNavClick));
             bind(self.monthNav, ["keyup", "increment"], onYearInput);
             bind(self.daysContainer, "mousedown", onClick(selectDate));
-            if (self.config.animate) {
-                bind(self.daysContainer, ["webkitAnimationEnd", "animationend"], animateDays);
-                bind(self.monthNav, ["webkitAnimationEnd", "animationend"], animateMonths);
-            }
         }
         if (self.timeContainer !== undefined &&
             self.minuteElement !== undefined &&
@@ -2237,9 +2234,11 @@ function FlatpickrInstance(element, instanceConfig) {
             var selText = function (e) {
                 return e.target.select();
             };
-            bind(self.timeContainer, ["wheel", "input", "increment"], updateTime);
+            bind(self.timeContainer, ["input", "increment"], updateTime);
             bind(self.timeContainer, "mousedown", onClick(timeIncrement));
-            bind(self.timeContainer, ["wheel", "input", "increment"], self._debouncedChange, { passive: true });
+            bind(self.timeContainer, ["input", "increment"], self._debouncedChange, {
+                passive: true,
+            });
             bind([self.hourElement, self.minuteElement], ["focus", "click"], selText);
             if (self.secondElement !== undefined)
                 bind(self.secondElement, "focus", function () { return self.secondElement && self.secondElement.select(); });
@@ -2249,51 +2248,6 @@ function FlatpickrInstance(element, instanceConfig) {
                     triggerChange();
                 }));
             }
-        }
-    }
-    function processPostDayAnimation() {
-        self._animationLoop.forEach(function (f) { return f(); });
-        self._animationLoop = [];
-    }
-    function animateDays(e) {
-        if (self.daysContainer && self.daysContainer.childNodes.length > 1) {
-            switch (e.animationName) {
-                case "fpSlideLeft":
-                    self.daysContainer.lastChild &&
-                        self.daysContainer.lastChild.classList.remove("slideLeftNew");
-                    self.daysContainer.removeChild(self.daysContainer
-                        .firstChild);
-                    self.days = self.daysContainer.firstChild;
-                    processPostDayAnimation();
-                    break;
-                case "fpSlideRight":
-                    self.daysContainer.firstChild &&
-                        self.daysContainer.firstChild.classList.remove("slideRightNew");
-                    self.daysContainer.removeChild(self.daysContainer
-                        .lastChild);
-                    self.days = self.daysContainer.firstChild;
-                    processPostDayAnimation();
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    function animateMonths(e) {
-        switch (e.animationName) {
-            case "fpSlideLeftNew":
-            case "fpSlideRightNew":
-                self.navigationCurrentMonth.classList.remove("slideLeftNew");
-                self.navigationCurrentMonth.classList.remove("slideRightNew");
-                var nav = self.navigationCurrentMonth;
-                while (nav.nextSibling &&
-                    /curr/.test(nav.nextSibling.className))
-                    self.monthNav.removeChild(nav.nextSibling);
-                while (nav.previousSibling &&
-                    /curr/.test(nav.previousSibling.className))
-                    self.monthNav.removeChild(nav.previousSibling);
-                self.oldCurMonth = undefined;
-                break;
         }
     }
     function jumpToDate(jumpDate) {
@@ -2449,21 +2403,17 @@ function FlatpickrInstance(element, instanceConfig) {
         };
         if (targetNode === undefined && offset !== 0) {
             if (offset > 0) {
-                self.changeMonth(1, true, undefined, true);
+                self.changeMonth(1, true, true);
                 newIndex = newIndex % 42;
             }
             else if (offset < 0) {
-                self.changeMonth(-1, true, undefined, true);
+                self.changeMonth(-1, true, true);
                 newIndex += 42;
             }
-            return afterDayAnim(focus);
         }
         focus();
     }
-    function afterDayAnim(fn) {
-        self.config.animate === true ? self._animationLoop.push(fn) : fn();
-    }
-    function buildDays(delta) {
+    function buildDays() {
         if (self.daysContainer === undefined) {
             return;
         }
@@ -2504,17 +2454,9 @@ function FlatpickrInstance(element, instanceConfig) {
             updateNavigationCurrentMonth();
         var dayContainer = createElement("div", "dayContainer");
         dayContainer.appendChild(days);
-        if (!self.config.animate || delta === undefined)
-            clearNode(self.daysContainer);
-        else {
-            while (self.daysContainer.childNodes.length > 1)
-                self.daysContainer.removeChild(self.daysContainer.firstChild);
-        }
-        if (delta && delta >= 0)
-            self.daysContainer.appendChild(dayContainer);
-        else
-            self.daysContainer.insertBefore(dayContainer, self.daysContainer.firstChild);
-        self.days = self.daysContainer.childNodes[0];
+        clearNode(self.daysContainer);
+        self.daysContainer.insertBefore(dayContainer, self.daysContainer.firstChild);
+        self.days = self.daysContainer.firstChild;
     }
     function buildMonthNav() {
         var monthNavFragment = window.document.createDocumentFragment();
@@ -2522,10 +2464,8 @@ function FlatpickrInstance(element, instanceConfig) {
         self.prevMonthNav = createElement("span", "flatpickr-prev-month");
         self.prevMonthNav.innerHTML = self.config.prevArrow;
         self.currentMonthElement = createElement("span", "cur-month");
-        self.currentMonthElement.title = self.l10n.scrollTitle;
         var yearInput = createNumberInput("cur-year", { tabindex: "-1" });
         self.currentYearElement = yearInput.childNodes[0];
-        self.currentYearElement.title = self.l10n.scrollTitle;
         if (self.config.minDate)
             self.currentYearElement.setAttribute("data-min", self.config.minDate.getFullYear().toString());
         if (self.config.maxDate) {
@@ -2588,7 +2528,6 @@ function FlatpickrInstance(element, instanceConfig) {
         self.hourElement.setAttribute("data-max", self.config.time_24hr ? "23" : "12");
         self.minuteElement.setAttribute("data-min", "0");
         self.minuteElement.setAttribute("data-max", "59");
-        self.hourElement.title = self.minuteElement.title = self.l10n.scrollTitle;
         self.timeContainer.appendChild(hourInput);
         self.timeContainer.appendChild(separator);
         self.timeContainer.appendChild(minuteInput);
@@ -2639,9 +2578,8 @@ function FlatpickrInstance(element, instanceConfig) {
             weekNumbers: weekNumbers,
         };
     }
-    function changeMonth(value, is_offset, animate, from_keyboard) {
+    function changeMonth(value, is_offset, from_keyboard) {
         if (is_offset === void 0) { is_offset = true; }
-        if (animate === void 0) { animate = self.config.animate; }
         if (from_keyboard === void 0) { from_keyboard = false; }
         var delta = is_offset ? value : value - self.currentMonth;
         if ((delta < 0 && self._hidePrevMonthArrow) ||
@@ -2653,54 +2591,14 @@ function FlatpickrInstance(element, instanceConfig) {
             self.currentMonth = (self.currentMonth + 12) % 12;
             triggerEvent("onYearChange");
         }
-        buildDays(animate ? delta : undefined);
-        if (!animate) {
-            triggerEvent("onMonthChange");
-            return updateNavigationCurrentMonth();
-        }
-        var nav = self.navigationCurrentMonth;
-        if (delta < 0) {
-            while (nav.nextSibling &&
-                /curr/.test(nav.nextSibling.className))
-                self.monthNav.removeChild(nav.nextSibling);
-        }
-        else if (delta > 0) {
-            while (nav.previousSibling &&
-                /curr/.test(nav.previousSibling.className))
-                self.monthNav.removeChild(nav.previousSibling);
-        }
-        self.oldCurMonth = self.navigationCurrentMonth;
-        self.navigationCurrentMonth = self.monthNav.insertBefore(self.oldCurMonth.cloneNode(true), delta > 0 ? self.oldCurMonth.nextSibling : self.oldCurMonth);
-        var daysContainer = self.daysContainer;
-        if (daysContainer.firstChild && daysContainer.lastChild) {
-            if (delta > 0) {
-                daysContainer.firstChild.classList.add("slideLeft");
-                daysContainer.lastChild.classList.add("slideLeftNew");
-                self.oldCurMonth.classList.add("slideLeft");
-                self.navigationCurrentMonth.classList.add("slideLeftNew");
-            }
-            else if (delta < 0) {
-                daysContainer.firstChild.classList.add("slideRightNew");
-                daysContainer.lastChild.classList.add("slideRight");
-                self.oldCurMonth.classList.add("slideRight");
-                self.navigationCurrentMonth.classList.add("slideRightNew");
-            }
-        }
-        self.currentMonthElement = self.navigationCurrentMonth
-            .firstChild;
-        self.currentYearElement = self.navigationCurrentMonth.lastChild
-            .childNodes[0];
+        buildDays();
+        triggerEvent("onMonthChange");
         updateNavigationCurrentMonth();
-        if (self.oldCurMonth.firstChild)
-            self.oldCurMonth.firstChild.textContent = monthToStr(self.currentMonth - delta, self.config.shorthandCurrentMonth, self.l10n);
-        afterDayAnim(function () { return triggerEvent("onMonthChange"); });
         if (from_keyboard &&
             document.activeElement &&
             document.activeElement.$i) {
-            var index_1 = document.activeElement.$i;
-            afterDayAnim(function () {
-                focusOnDay(index_1, 0);
-            });
+            var index = document.activeElement.$i;
+            focusOnDay(index, 0);
         }
     }
     function clear(triggerChangeEvent) {
@@ -2934,7 +2832,7 @@ function FlatpickrInstance(element, instanceConfig) {
                             if (!e.ctrlKey)
                                 focusOnDay(e.target.$i, delta_1);
                             else
-                                changeMonth(delta_1, true, undefined, true);
+                                changeMonth(delta_1, true, true);
                         }
                     }
                     else if (self.hourElement)
@@ -3133,7 +3031,6 @@ function FlatpickrInstance(element, instanceConfig) {
             "onYearChange",
             "onPreCalendarPosition",
         ];
-        self.config = __assign({}, flatpickr.defaultConfig);
         var userConfig = __assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
         var formats$$1 = {};
         self.config.parseDate = userConfig.parseDate;
@@ -3218,11 +3115,11 @@ function FlatpickrInstance(element, instanceConfig) {
         if (typeof self.config.locale !== "object" &&
             typeof flatpickr.l10ns[self.config.locale] === "undefined")
             self.config.errorHandler(new Error("flatpickr: invalid locale " + self.config.locale));
-        self.l10n = __assign({}, flatpickr.l10ns.default, typeof self.config.locale === "object"
+        self.l10n = __assign({}, flatpickr.l10ns.default, (typeof self.config.locale === "object"
             ? self.config.locale
             : self.config.locale !== "default"
                 ? flatpickr.l10ns[self.config.locale]
-                : undefined);
+                : undefined));
         tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
         self.formatDate = createDateFormatter(self);
     }
@@ -3267,10 +3164,13 @@ function FlatpickrInstance(element, instanceConfig) {
     }
     function focusAndClose() {
         self._input.focus();
-        if (window.navigator.userAgent.indexOf("MSIE") === -1)
-            self.close();
-        else
+        if (window.navigator.userAgent.indexOf("MSIE") !== -1 ||
+            navigator.msMaxTouchPoints !== undefined) {
             setTimeout(self.close, 0);
+        }
+        else {
+            self.close();
+        }
     }
     function selectDate(e) {
         e.preventDefault();
@@ -3343,7 +3243,7 @@ function FlatpickrInstance(element, instanceConfig) {
         if (!shouldChangeMonth)
             focusOnDay(target.$i, 0);
         else
-            afterDayAnim(function () { return self.selectedDateElem && self.selectedDateElem.focus(); });
+            self.selectedDateElem && self.selectedDateElem.focus();
         if (self.hourElement !== undefined)
             setTimeout(function () { return self.hourElement !== undefined && self.hourElement.select(); }, 451);
         if (self.config.closeOnSelect) {
@@ -3399,7 +3299,8 @@ function FlatpickrInstance(element, instanceConfig) {
         else
             self.config.errorHandler(new Error("Invalid date supplied: " + JSON.stringify(inputDate)));
         self.selectedDates = dates.filter(function (d) { return d instanceof Date && isEnabled(d, false); });
-        self.selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
+        if (self.config.mode === "range")
+            self.selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
     }
     function setDate(date, triggerChange, format) {
         if (triggerChange === void 0) { triggerChange = false; }
@@ -3497,6 +3398,7 @@ function FlatpickrInstance(element, instanceConfig) {
             self.altInput.placeholder = self.input.placeholder;
             self.altInput.disabled = self.input.disabled;
             self.altInput.required = self.input.required;
+            self.altInput.tabIndex = self.input.tabIndex;
             self.altInput.type = "text";
             self.input.type = "hidden";
             if (!self.config.static && self.input.parentNode)
@@ -3515,6 +3417,7 @@ function FlatpickrInstance(element, instanceConfig) {
         self.mobileInput.tabIndex = 1;
         self.mobileInput.type = inputType;
         self.mobileInput.disabled = self.input.disabled;
+        self.mobileInput.required = self.input.required;
         self.mobileInput.placeholder = self.input.placeholder;
         self.mobileFormatStr =
             inputType === "datetime-local"
@@ -3616,33 +3519,22 @@ function FlatpickrInstance(element, instanceConfig) {
         if (triggerChange !== false)
             triggerEvent("onValueUpdate");
     }
-    function onMonthNavScroll(e) {
-        e.preventDefault();
-        var isYear = self.currentYearElement.parentNode &&
-            self.currentYearElement.parentNode.contains(e.target);
-        if (e.target === self.currentMonthElement || isYear) {
-            var delta = mouseDelta(e);
-            if (isYear) {
-                changeYear(self.currentYear + delta);
-                e.target.value = self.currentYear.toString();
-            }
-            else
-                self.changeMonth(delta, true, false);
-        }
-    }
     function onMonthNavClick(e) {
+        e.preventDefault();
         var isPrevMonth = self.prevMonthNav.contains(e.target);
         var isNextMonth = self.nextMonthNav.contains(e.target);
-        if (isPrevMonth || isNextMonth)
+        if (isPrevMonth || isNextMonth) {
             changeMonth(isPrevMonth ? -1 : 1);
+        }
         else if (e.target === self.currentYearElement) {
-            e.preventDefault();
             self.currentYearElement.select();
         }
-        else if (e.target.className === "arrowUp")
+        else if (e.target.className === "arrowUp") {
             self.changeYear(self.currentYear + 1);
-        else if (e.target.className === "arrowDown")
+        }
+        else if (e.target.className === "arrowDown") {
             self.changeYear(self.currentYear - 1);
+        }
     }
     function timeWrapper(e) {
         e.preventDefault();
@@ -3652,9 +3544,7 @@ function FlatpickrInstance(element, instanceConfig) {
                 self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
         }
         var min = parseFloat(input.getAttribute("data-min")), max = parseFloat(input.getAttribute("data-max")), step = parseFloat(input.getAttribute("data-step")), curValue = parseInt(input.value, 10), delta = e.delta ||
-            (isKeyDown
-                ? e.which === 38 ? 1 : -1
-                : Math.max(-1, Math.min(1, e.wheelDelta || -e.deltaY)) || 0);
+            (isKeyDown ? (e.which === 38 ? 1 : -1) : 0);
         var newValue = curValue + step * delta;
         if (typeof input.value !== "undefined" && input.value.length === 2) {
             var isHourElem = input === self.hourElement, isMinuteElem = input === self.minuteElement;
@@ -3750,7 +3640,7 @@ Date.prototype.fp_incr = function (days) {
 };
 var flatpickr$1 = flatpickr;
 
-exports['default'] = flatpickr$1;
+exports.default = flatpickr$1;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
@@ -3778,6 +3668,8 @@ var _Shell = __webpack_require__(20);
 
 var _data = __webpack_require__(1);
 
+var _analytics = __webpack_require__(21);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var root = document.getElementById("appContainer");
@@ -3799,6 +3691,11 @@ _mithril2.default.route(root, "/", {
 		view: function view(vnode) {
 			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_ViewItem.ViewItem, vnode.attrs));
 		}
+	},
+	"/analytics": {
+		view: function view(vnode) {
+			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_analytics.Analytics, vnode.attrs));
+		}
 	}
 });
 
@@ -3806,7 +3703,7 @@ _mithril2.default.route(root, "/", {
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var apply = Function.prototype.apply;
+/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
 
 // DOM APIs, for completeness
 
@@ -3857,9 +3754,17 @@ exports._unrefActive = exports.active = function(item) {
 
 // setimmediate attaches itself to the global object
 __webpack_require__(8);
-exports.setImmediate = setImmediate;
-exports.clearImmediate = clearImmediate;
+// On some exotic environments, it's not clear which object `setimmeidate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
 
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 8 */
@@ -4052,7 +3957,7 @@ exports.clearImmediate = clearImmediate;
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(9)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(9)))
 
 /***/ }),
 /* 9 */
@@ -5527,7 +5432,7 @@ var HomePage = exports.HomePage = {
 
 	return $iziToast;
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 12 */
@@ -5584,7 +5489,7 @@ var NewDriverPage = exports.NewDriverPage = {
 					{
 						"class": "fr pv2 ph3 bg-white shadow-4 ",
 						onclick: function onclick() {
-							return _data.Data.Submit();
+							_data.Data.Submit();
 						}
 					},
 					"Save"
@@ -5709,7 +5614,7 @@ var _mithril2 = _interopRequireDefault(_mithril);
 
 var _TextInput = __webpack_require__(2);
 
-var _ImageInput = __webpack_require__(3);
+var _ImageInput = __webpack_require__(4);
 
 var _data = __webpack_require__(1);
 
@@ -5882,7 +5787,7 @@ var _mithril2 = _interopRequireDefault(_mithril);
 
 var _TextInput = __webpack_require__(2);
 
-var _ImageInput = __webpack_require__(3);
+var _ImageInput = __webpack_require__(4);
 
 var _data = __webpack_require__(1);
 
@@ -6063,7 +5968,7 @@ var _mithril2 = _interopRequireDefault(_mithril);
 
 var _TextInput = __webpack_require__(2);
 
-var _ImageInput = __webpack_require__(3);
+var _ImageInput = __webpack_require__(4);
 
 var _data = __webpack_require__(1);
 
@@ -6223,7 +6128,7 @@ var _mithril2 = _interopRequireDefault(_mithril);
 
 var _TextInput = __webpack_require__(2);
 
-var _ImageInput = __webpack_require__(3);
+var _ImageInput = __webpack_require__(4);
 
 var _data = __webpack_require__(1);
 
@@ -6761,6 +6666,8 @@ var _flatpickr = __webpack_require__(5);
 
 var _flatpickr2 = _interopRequireDefault(_flatpickr);
 
+var _svgIcons = __webpack_require__(22);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Shell = exports.Shell = {
@@ -6802,12 +6709,21 @@ var Shell = exports.Shell = {
 						),
 						(0, _mithril2.default)(
 							"form",
-							{ "class": "dib pl3 w5" },
+							{ "class": "dib pl3 w5 relative" },
 							(0, _mithril2.default)("input", {
 								type: "text",
-								"class": "bg-white br4 bw0 pa2 w-100 f6 ph3",
-								placeholder: "form number, name, slot number, etc"
-							})
+								"class": "bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib",
+								placeholder: "form number, name, slot number, etc",
+								style: "outline: none"
+							}),
+							(0, _mithril2.default)(
+								"p",
+								{ "class": "mv0 dib w1 h1 absolute pointer", style: "top: 0.5rem; right:0.5rem",
+									onclick: function onclick() {
+										console.log("Search button clicked");
+									} },
+								(0, _mithril2.default)(_svgIcons.SVGIcons, { type: "search" })
+							)
 						)
 					),
 					(0, _mithril2.default)(
@@ -6879,6 +6795,667 @@ var Shell = exports.Shell = {
 			),
 			vnode.children
 		);
+	}
+};
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Analytics = {
+    view: function view(vnode) {
+        return (0, _mithril2.default)(
+            "section",
+            { "class": "" },
+            (0, _mithril2.default)(
+                "table",
+                { "class": "f6 w-100  center ba b--black-20 bg-white", cellspacing: "0" },
+                (0, _mithril2.default)(
+                    "thead",
+                    { "class": "tc" },
+                    (0, _mithril2.default)(
+                        "tr",
+                        { "class": "bg-near-white" },
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "S/N"
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Name"
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Reg. No."
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Vehicle No."
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Form No."
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Actions"
+                        )
+                    )
+                ),
+                (0, _mithril2.default)(
+                    "tbody",
+                    { "class": "lh-copy" },
+                    (0, _mithril2.default)(
+                        "tr",
+                        null,
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" })
+                    )
+                )
+            )
+        );
+    }
+};
+
+exports.default = Analytics;
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.Icon = exports.SVGIcons = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SVGIcons = exports.SVGIcons = {
+	view: function view(vnode) {
+		switch (vnode.attrs.type) {
+			case "logo-black":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ "class": "w-100", viewBox: "0 0 36 26" }, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						{
+							id: "Welcome",
+							stroke: "none",
+							"stroke-width": "1",
+							fill: "none",
+							"fill-rule": "evenodd"
+						},
+						(0, _mithril2.default)(
+							"g",
+							{
+								id: "Mobile-Portrait-Copy",
+								transform: "translate(-16.000000, -12.000000)"
+							},
+							(0, _mithril2.default)(
+								"g",
+								{ id: "logo", transform: "translate(10.000000, 9.000000)" },
+								(0, _mithril2.default)(
+									"g",
+									{ id: "Group-3", transform: "translate(6.000000, 3.000000)" },
+									(0, _mithril2.default)(
+										"g",
+										{
+											id: "Group-2",
+											transform: "translate(7.973666, 0.000000)",
+											fill: "#2E3938"
+										},
+										(0, _mithril2.default)(
+											"g",
+											{ id: "Group-Copy", "fill-rule": "nonzero" },
+											(0, _mithril2.default)("path", {
+												d: "M0.0436856122,24.7067099 C-0.0427713225,25.4129674 0.487478465,25.9848377 1.22451348,25.9833184 L26.6698414,25.9308675 C27.4084516,25.929345 27.9369572,25.4565539 27.8506693,24.8766868 L25.4856554,8.68075251 C25.3991985,8.07761682 24.7354388,7.50631105 23.9913314,7.40378973 L19.9729071,6.85014088 L19.9729071,5.72693317 C19.9729071,5.72693317 19.9729071,1.23410141 13.9471774,0.156058938 C7.92144775,-0.921983453 7.92144775,3.9673789 7.92144775,3.9673789 L7.92144775,5.18971974 C7.92144775,5.86479994 8.52532656,6.49029414 9.26620998,6.58627691 L15.955754,7.45291925 L15.955754,6.29666717 L9.26049879,5.37421097 L9.26049879,4.16288493 C9.26049879,4.16288493 9.26049879,0.528902807 13.9471774,1.32883321 C18.6338561,2.12876342 18.6338561,5.53142714 18.6338561,5.53142714 L18.6338561,6.66564964 C18.6338561,7.29206343 19.2275287,7.87678349 19.971636,7.97318391 L23.9900603,8.49377794 L26.4673129,24.8614991 L1.42704202,24.7071383 L3.90429462,5.89163123 L5.24334566,6.06510767 L5.24334566,4.82073726 L2.56524357,4.45175478 L0.0436856122,24.7067099 Z",
+												id: "Shape"
+											})
+										),
+										(0, _mithril2.default)("path", {
+											d: "M11.7246818,19.6279318 L9.33430967,19.5601143 L9.45245768,18.8187369 L7.63048009,18.7420307 L8.84101662,12.2597894 L12.4136013,12.9097416 L11.7246818,19.6279318 Z M10.9259389,13.1195253 L10.3827763,17.1530716 L9.88143642,17.1151826 L10.4731534,13.042845 L9.34874816,12.8511441 L8.40513073,18.2686432 L10.208328,18.3613224 L10.1117847,19.0915943 L11.4256977,19.1406799 L12.0654613,13.3112262 L10.9259389,13.1195253 Z M15.8628212,19.744877 L13.4605922,19.6770596 L13.5135401,18.9888025 L11.6781515,18.9120962 L12.3046543,12.8902314 L15.9908743,13.5401836 L15.8628212,19.744877 Z M14.3968514,13.6979063 L14.1917637,17.4388589 L13.6839848,17.4009699 L13.9310344,13.621226 L12.7740505,13.4295251 L12.3002486,18.4683735 L14.1191963,18.5610527 L14.0844072,19.2396905 L15.406662,19.288776 L15.5689524,13.8896072 L14.3968514,13.6979063 Z M19.6514083,14.1660832 L19.9913705,19.8609796 L15.7045676,19.7404153 L15.8523716,13.516131 L19.6514083,14.1660832 Z M15.9895113,13.9579638 L15.8788198,19.3062789 L19.065878,19.4240843 L18.8558503,14.4180458 L15.9895113,13.9579638 Z M17.6702826,15.2353428 L17.721007,18.3249808 L17.2008244,18.2939373 L17.182182,15.1700717 L17.6702826,15.2353428 Z",
+											id: "440-copy",
+											stroke: "#2E3938",
+											"stroke-width": "0.5"
+										})
+									),
+									(0, _mithril2.default)("rect", {
+										id: "Rectangle-2",
+										fill: "#2D3938",
+										transform: "translate(6.178707, 7.702437) rotate(8.000000) translate(-6.178707, -7.702437) ",
+										x: "3.40463511",
+										y: "6.94062199",
+										width: "5.54814319",
+										height: "1.52362949"
+									}),
+									(0, _mithril2.default)("rect", {
+										id: "Rectangle-2-Copy-2",
+										fill: "#2D3938",
+										transform: "translate(4.087669, 13.256233) rotate(8.000000) translate(-4.087669, -13.256233) ",
+										x: "0.0987211391",
+										y: "12.4944185",
+										width: "7.97789668",
+										height: "1.52362949"
+									}),
+									(0, _mithril2.default)("rect", {
+										id: "Rectangle-2-Copy",
+										fill: "#2D3938",
+										transform: "translate(4.743779, 18.878940) rotate(7.000000) translate(-4.743779, -18.878940) ",
+										x: "1.96970713",
+										y: "18.1171252",
+										width: "5.54814319",
+										height: "1.52362949"
+									})
+								)
+							)
+						)
+					)
+				);
+			case "logo-white":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, {
+						viewBox: "0 0 36 26"
+					}),
+					(0, _mithril2.default)("style", null),
+					(0, _mithril2.default)(
+						"g",
+						{ fill: "none" },
+						(0, _mithril2.default)(
+							"g",
+							{ fill: "#fff" },
+							(0, _mithril2.default)("path", { d: "M8 24.7C7.9 25.4 8.5 26 9.2 26L34.6 25.9C35.4 25.9 35.9 25.5 35.8 24.9L33.5 8.7C33.4 8.1 32.7 7.5 32 7.4L27.9 6.9 27.9 5.7C27.9 5.7 27.9 1.2 21.9 0.2 15.9-0.9 15.9 4 15.9 4L15.9 5.2C15.9 5.9 16.5 6.5 17.2 6.6L23.9 7.5 23.9 6.3 17.2 5.4 17.2 4.2C17.2 4.2 17.2 0.5 21.9 1.3 26.6 2.1 26.6 5.5 26.6 5.5L26.6 6.7C26.6 7.3 27.2 7.9 27.9 8L32 8.5 34.4 24.9 9.4 24.7 11.9 5.9 13.2 6.1 13.2 4.8 10.5 4.5 8 24.7Z" }),
+							(0, _mithril2.default)("path", {
+								d: "M19.7 19.6L17.3 19.6 17.4 18.8 15.6 18.7 16.8 12.3 20.4 12.9 19.7 19.6ZM18.9 13.1L18.4 17.2 17.9 17.1 18.4 13 17.3 12.9 16.4 18.3 18.2 18.4 18.1 19.1 19.4 19.1 20 13.3 18.9 13.1ZM23.8 19.7L21.4 19.7 21.5 19 19.7 18.9 20.3 12.9 24 13.5 23.8 19.7ZM22.4 13.7L22.2 17.4 21.7 17.4 21.9 13.6 20.7 13.4 20.3 18.5 22.1 18.6 22.1 19.2 23.4 19.3 23.5 13.9 22.4 13.7ZM27.6 14.2L28 19.9 23.7 19.7 23.8 13.5 27.6 14.2ZM24 14L23.9 19.3 27 19.4 26.8 14.4 24 14ZM25.6 15.2L25.7 18.3 25.2 18.3 25.2 15.2 25.6 15.2Z",
+								style: "stroke-width:0.5;stroke:#fff"
+							})
+						),
+						(0, _mithril2.default)("rect", {
+							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(6.178707 7.702437)rotate(8)",
+							x: "-2.8",
+							y: "-0.8",
+							width: "5.5",
+							height: "1.5",
+							"class": "a"
+						}),
+						(0, _mithril2.default)("rect", {
+							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(4.087669 13.256233)rotate(8)",
+							x: "-4",
+							y: "-0.8",
+							width: "8",
+							height: "1.5",
+							"class": "a"
+						}),
+						(0, _mithril2.default)("rect", {
+							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(4.743779 18.87894)rotate(7)",
+							x: "-2.8",
+							y: "-0.8",
+							width: "5.5",
+							height: "1.5",
+							"class": "a",
+							fill: "#fff"
+						})
+					)
+				);
+			case "facebook":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						viewBox: "0 0 32 32",
+						role: "presentation",
+						"aria-hidden": "true",
+						focusable: "false"
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", {
+						"fill-rule": "evenodd",
+						d: "M8 14.408v-4.165c0-.424.35-.812.77-.812h2.519V7.347c0-4.84 2.484-7.311 7.42-7.347 1.645 0 3.219.212 4.692.636.455.141.63.424.595.883l-.56 4.062c-.035.178-.14.354-.315.531-.21.105-.42.176-.63.14-.875-.247-1.784-.352-2.799-.352-1.399 0-1.61.283-1.61 1.73v1.8H22.6c.42 0 .805.423.805.883l-.349 4.17c0 .422-.35.705-.77.705H18.08v16c0 .424-.349.812-.769.812h-5.213c-.42 0-.804-.388-.804-.812V15.185h-2.52A.781.781 0 0 1 8 14.408"
+					})
+				);
+			case "google":
+				return (0, _mithril2.default)(
+					"svg",
+					{ width: "30px", height: "30px", viewBox: "10 10 25 25", version: "1.1", xmlns: "http://www.w3.org/2000/svg" },
+					(0, _mithril2.default)(
+						"title",
+						null,
+						"btn_google_light_normal_ios"
+					),
+					(0, _mithril2.default)(
+						"desc",
+						null,
+						"Created with Sketch."
+					),
+					(0, _mithril2.default)(
+						"defs",
+						null,
+						(0, _mithril2.default)(
+							"filter",
+							{ x: "-50%", y: "-50%", width: "200%", height: "200%", filterUnits: "objectBoundingBox", id: "filter-1" },
+							(0, _mithril2.default)("feOffset", { dx: "0", dy: "1", "in": "SourceAlpha", result: "shadowOffsetOuter1" }),
+							(0, _mithril2.default)("feGaussianBlur", { stdDeviation: "0.5", "in": "shadowOffsetOuter1", result: "shadowBlurOuter1" }),
+							(0, _mithril2.default)("feColorMatrix", { values: "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.168 0", "in": "shadowBlurOuter1", type: "matrix", result: "shadowMatrixOuter1" }),
+							(0, _mithril2.default)("feOffset", { dx: "0", dy: "0", "in": "SourceAlpha", result: "shadowOffsetOuter2" }),
+							(0, _mithril2.default)("feGaussianBlur", { stdDeviation: "0.5", "in": "shadowOffsetOuter2", result: "shadowBlurOuter2" }),
+							(0, _mithril2.default)("feColorMatrix", { values: "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.084 0", "in": "shadowBlurOuter2", type: "matrix", result: "shadowMatrixOuter2" }),
+							(0, _mithril2.default)(
+								"feMerge",
+								null,
+								(0, _mithril2.default)("feMergeNode", { "in": "shadowMatrixOuter1" }),
+								(0, _mithril2.default)("feMergeNode", { "in": "shadowMatrixOuter2" }),
+								(0, _mithril2.default)("feMergeNode", { "in": "SourceGraphic" })
+							)
+						),
+						(0, _mithril2.default)("rect", { id: "path-2", x: "0", y: "0", width: "40", height: "40", rx: "2" })
+					),
+					(0, _mithril2.default)(
+						"g",
+						{ id: "Google-Button", stroke: "none", "stroke-width": "1", fill: "none", "fill-rule": "evenodd" },
+						(0, _mithril2.default)("g", { id: "9-PATCH", transform: "translate(-608.000000, -160.000000)" }),
+						(0, _mithril2.default)(
+							"g",
+							{ id: "btn_google_light_normal", transform: "translate(-1.000000, -1.000000)" },
+							(0, _mithril2.default)(
+								"g",
+								{ id: "button", transform: "translate(4.000000, 4.000000)", filter: "url(#filter-1)" },
+								(0, _mithril2.default)(
+									"g",
+									{ id: "button-bg" },
+									(0, _mithril2.default)("use", { fill: "#FFFFFF", "fill-rule": "evenodd" }),
+									(0, _mithril2.default)("use", { fill: "none" }),
+									(0, _mithril2.default)("use", { fill: "none" }),
+									(0, _mithril2.default)("use", { fill: "none" })
+								)
+							),
+							(0, _mithril2.default)(
+								"g",
+								{ id: "logo_googleg_48dp", transform: "translate(15.000000, 15.000000)" },
+								(0, _mithril2.default)("path", { d: "M17.64,9.20454545 C17.64,8.56636364 17.5827273,7.95272727 17.4763636,7.36363636 L9,7.36363636 L9,10.845 L13.8436364,10.845 C13.635,11.97 13.0009091,12.9231818 12.0477273,13.5613636 L12.0477273,15.8195455 L14.9563636,15.8195455 C16.6581818,14.2527273 17.64,11.9454545 17.64,9.20454545 L17.64,9.20454545 Z", id: "Shape", fill: "#4285F4" }),
+								(0, _mithril2.default)("path", { d: "M9,18 C11.43,18 13.4672727,17.1940909 14.9563636,15.8195455 L12.0477273,13.5613636 C11.2418182,14.1013636 10.2109091,14.4204545 9,14.4204545 C6.65590909,14.4204545 4.67181818,12.8372727 3.96409091,10.71 L0.957272727,10.71 L0.957272727,13.0418182 C2.43818182,15.9831818 5.48181818,18 9,18 L9,18 Z", id: "Shape", fill: "#34A853" }),
+								(0, _mithril2.default)("path", { d: "M3.96409091,10.71 C3.78409091,10.17 3.68181818,9.59318182 3.68181818,9 C3.68181818,8.40681818 3.78409091,7.83 3.96409091,7.29 L3.96409091,4.95818182 L0.957272727,4.95818182 C0.347727273,6.17318182 0,7.54772727 0,9 C0,10.4522727 0.347727273,11.8268182 0.957272727,13.0418182 L3.96409091,10.71 L3.96409091,10.71 Z", id: "Shape", fill: "#FBBC05" }),
+								(0, _mithril2.default)("path", { d: "M9,3.57954545 C10.3213636,3.57954545 11.5077273,4.03363636 12.4404545,4.92545455 L15.0218182,2.34409091 C13.4631818,0.891818182 11.4259091,0 9,0 C5.48181818,0 2.43818182,2.01681818 0.957272727,4.95818182 L3.96409091,7.29 C4.67181818,5.16272727 6.65590909,3.57954545 9,3.57954545 L9,3.57954545 Z", id: "Shape", fill: "#EA4335" }),
+								(0, _mithril2.default)("path", { d: "M0,0 L18,0 L18,18 L0,18 L0,0 Z", id: "Shape" })
+							),
+							(0, _mithril2.default)("g", { id: "handles_square" })
+						)
+					)
+				);
+			case "email":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						viewBox: "0 0 24 24",
+						role: "presentation",
+						"aria-hidden": "true",
+						focusable: "false",
+						style: "fill: currentcolor;"
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", {
+						"fill-rule": "evenodd",
+						d: "M22.497 4H1.503C.665 4 0 4.673 0 5.507v12.985C0 19.326.672 20 1.503 20h20.994A1.5 1.5 0 0 0 24 18.492V5.507C24 4.674 23.328 4 22.497 4zM23 18.203l-6.141-7.907L23 5.628v12.575zM22.174 5l-9.685 7.362c-.259.196-.719.196-.977 0L1.827 5h20.347zM1 5.628l6.14 4.667L1 18.185V5.629zM1.634 19l6.302-8.1 2.97 2.258c.616.468 1.572.468 2.188 0l2.969-2.257L22.353 19H1.633z"
+					})
+				);
+			case "location":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						width: "17",
+						height: "25",
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						viewBox: "0 0 54.757 54.757",
+						style: "enable-background:new 0 0 54.757 54.757;"
+
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", { d: "M27.557,12c-3.859,0-7,3.141-7,7s3.141,7,7,7s7-3.141,7-7S31.416,12,27.557,12z M27.557,24c-2.757,0-5-2.243-5-5\r s2.243-5,5-5s5,2.243,5,5S30.314,24,27.557,24z" }),
+					(0, _mithril2.default)("path", { d: "M40.94,5.617C37.318,1.995,32.502,0,27.38,0c-5.123,0-9.938,1.995-13.56,5.617c-6.703,6.702-7.536,19.312-1.804,26.952\r L27.38,54.757L42.721,32.6C48.476,24.929,47.643,12.319,40.94,5.617z M41.099,31.431L27.38,51.243L13.639,31.4\r C8.44,24.468,9.185,13.08,15.235,7.031C18.479,3.787,22.792,2,27.38,2s8.901,1.787,12.146,5.031\r C45.576,13.08,46.321,24.468,41.099,31.431z" })
+				);
+			case "search":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						x: "0px",
+						y: "0px",
+						viewBox: "0 0 56.966 56.966",
+						style: "enable-background:new 0 0 56.966 56.966; "
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", {
+						d: "M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23\r s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92\r c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17\r s-17-7.626-17-17S14.61,6,23.984,6z",
+						fill: "gray"
+					})
+				);
+			case "down":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						x: "0px",
+						y: "0px",
+						viewBox: "0 0 256 256",
+						style: "enable-background:new 0 0 256 256;"
+					}, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("polygon", { points: "225.813,48.907 128,146.72 30.187,48.907 0,79.093 128,207.093 256,79.093" })
+						)
+					)
+				);
+
+			case "up":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						x: "0px",
+						y: "0px",
+						viewBox: "0 0 256 256",
+						style: "enable-background:new 0 0 256 256;"
+					}, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("polygon", { points: "128,48.907 0,176.907 30.187,207.093 128,109.28 225.813,207.093 256,176.907 \t\t" })
+						)
+					)
+				);
+			case "bag":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { viewBox: "0 0 19 18", version: "1.1" }),
+					(0, _mithril2.default)(
+						"g",
+						{
+							id: "Welcome",
+							stroke: "none",
+							"stroke-width": "1",
+							fill: "none",
+							"fill-rule": "evenodd"
+						},
+						(0, _mithril2.default)(
+							"g",
+							{
+								id: "Mobile-Portrait-Copy-2",
+								transform: "translate(-179.000000, -730.000000)",
+								"fill-rule": "nonzero",
+								fill: "#000000"
+							},
+							(0, _mithril2.default)(
+								"g",
+								{
+									id: "shopping-basket-button-copy",
+									transform: "translate(179.000000, 730.000000)"
+								},
+								(0, _mithril2.default)("path", {
+									d: "M14.1167266,6.59969262 L10.282554,0.391905738 C10.1082392,0.203790984 9.84685252,0.0156762295 9.58543165,0.0156762295 C9.32401079,0.0156762295 9.06258993,0.109733607 8.88830935,0.391905738 L5.05413669,6.59969262 L0.871402878,6.59969262 C0.348561151,6.59969262 0,6.97592213 0,7.54026639 L0,7.82243852 L2.17850719,16.5697746 C2.35278777,17.3222336 3.04991007,17.9806352 3.83417266,17.9806352 L15.1624101,17.9806352 C15.9466727,17.9806352 16.643795,17.416291 16.8180755,16.5697746 L18.9965827,7.82243852 L18.9965827,7.54026639 C18.9965827,6.97592213 18.6480216,6.59969262 18.1251799,6.59969262 L14.1167266,6.59969262 Z M6.97122302,6.59969262 L9.58543165,2.46116803 L12.1996403,6.59969262 L6.97122302,6.59969262 Z M9.58543165,14.1242828 C8.62688849,14.1242828 7.8426259,13.2777664 7.8426259,12.2431352 C7.8426259,11.2085041 8.62688849,10.3619877 9.58543165,10.3619877 C10.5439748,10.3619877 11.3282374,11.2085041 11.3282374,12.2431352 C11.3282374,13.2777664 10.5439748,14.1242828 9.58543165,14.1242828 Z",
+									id: "Shape"
+								})
+							)
+						)
+					)
+				);
+			case "wishlist":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { viewBox: "0 0 25 15" }),
+					(0, _mithril2.default)(
+						"g",
+						{ id: "Welcome", stroke: "none", "stroke-width": "1", fill: "none", "fill-rule": "evenodd" },
+						(0, _mithril2.default)(
+							"g",
+							{ id: "Mobile-Portrait-Copy-2", transform: "translate(-23.000000, -732.000000)", "fill-rule": "nonzero", fill: "#030104" },
+							(0, _mithril2.default)(
+								"g",
+								{ id: "add-to-list-copy", transform: "translate(23.000000, 732.500000)" },
+								(0, _mithril2.default)("path", { d: "M10,7 C10,7.784 9.45,8.4 8.75,8.4 L1.25,8.4 C0.55,8.4 0,7.784 0,7 C0,6.216 0.55,5.6 1.25,5.6 L8.75,5.6 C9.45,5.6 10,6.216 10,7 Z M8.75,11.2 L1.25,11.2 C0.55,11.2 0,11.816 0,12.6 C0,13.384 0.55,14 1.25,14 L8.75,14 C9.45,14 10,13.384 10,12.6 C10,11.816 9.45,11.2 8.75,11.2 Z M24.25,5.6 L20,5.6 L20,0.84 C20,0.056 19.45,0 18.75,0 C18.05,0 17.5,0.056 17.5,0.84 L17.5,5.6 L13.375,5.6 C12.675,5.6 12.625,6.216 12.625,7 C12.625,7.784 12.675,8.4 13.375,8.4 L17.5,8.4 L17.5,13.16 C17.5,13.944 18.05,14 18.75,14 C19.45,14 20,13.944 20,13.16 L20,8.4 L24.25,8.4 C24.95,8.4 25,7.784 25,7 C25,6.216 24.95,5.6 24.25,5.6 Z M8.75,0 L1.25,0 C0.55,0 0,0.616 0,1.4 C0,2.184 0.55,2.8 1.25,2.8 L8.75,2.8 C9.45,2.8 10,2.184 10,1.4 C10,0.616 9.45,0 8.75,0 Z", id: "Shape" })
+							)
+						)
+					)
+				);
+			case "logout":
+				return (0, _mithril2.default)(
+					"svg",
+					{ version: "1.1", id: "Capa_1", xmlns: "http://www.w3.org/2000/svg", x: "0px", y: "0px",
+						viewBox: "0 0 490.667 490.667", style: "enable-background:new 0 0 490.667 490.667;" },
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("path", { d: "M330.667,192c5.888,0,10.667-4.779,10.667-10.667v-128C341.333,23.936,317.419,0,288,0H53.333C23.915,0,0,23.936,0,53.333\r v384c0,29.397,23.915,53.333,53.333,53.333H288c29.419,0,53.333-23.936,53.333-53.333v-128c0-5.888-4.779-10.667-10.667-10.667\r S320,303.445,320,309.333v128c0,17.643-14.357,32-32,32H53.333c-17.643,0-32-14.357-32-32v-384c0-17.643,14.357-32,32-32H288\r c17.643,0,32,14.357,32,32v128C320,187.221,324.779,192,330.667,192z" })
+						)
+					),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("path", { d: "M480,234.667H138.667c-5.888,0-10.667,4.779-10.667,10.667S132.779,256,138.667,256H480\r c5.888,0,10.667-4.779,10.667-10.667S485.888,234.667,480,234.667z" })
+						)
+					),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("path", { d: "M487.531,237.824l-64-64c-4.16-4.16-10.923-4.16-15.083,0c-4.16,4.16-4.16,10.923,0,15.083l56.448,56.448l-56.448,56.448\r c-4.16,4.16-4.16,10.923,0,15.083c2.091,2.069,4.821,3.115,7.552,3.115c2.731,0,5.461-1.045,7.531-3.093l64-64\r C491.691,248.747,491.691,241.984,487.531,237.824z" })
+						)
+					)
+				);
+
+			case "loader":
+				return (0, _mithril2.default)(
+					"div",
+					{ "class": "dib w-100 tc" },
+					(0, _mithril2.default)(
+						"svg",
+						{ width: "38", height: "38", viewBox: "0 0 38 38", xmlns: "http://www.w3.org/2000/svg" },
+						(0, _mithril2.default)(
+							"defs",
+							null,
+							(0, _mithril2.default)(
+								"linearGradient",
+								{ x1: "8.042%", y1: "0%", x2: "65.682%", y2: "23.865%", id: "a" },
+								(0, _mithril2.default)("stop", { "stop-color": "#000", "stop-opacity": "0", offset: "0%" }),
+								(0, _mithril2.default)("stop", { "stop-color": "#000", "stop-opacity": ".631", offset: "63.146%" }),
+								(0, _mithril2.default)("stop", { "stop-color": "#000", offset: "100%" })
+							)
+						),
+						(0, _mithril2.default)(
+							"g",
+							{ fill: "none", "fill-rule": "evenodd" },
+							(0, _mithril2.default)(
+								"g",
+								{ transform: "translate(1 1)" },
+								(0, _mithril2.default)(
+									"path",
+									{ d: "M36 18c0-9.94-8.06-18-18-18", id: "Oval-2", stroke: "url(#a)", "stroke-width": "2" },
+									(0, _mithril2.default)("animateTransform", {
+										attributeName: "transform",
+										type: "rotate",
+										from: "0 18 18",
+										to: "360 18 18",
+										dur: "0.9s",
+										repeatCount: "indefinite" })
+								),
+								(0, _mithril2.default)(
+									"circle",
+									{ fill: "#fff", cx: "36", cy: "18", r: "1" },
+									(0, _mithril2.default)("animateTransform", {
+										attributeName: "transform",
+										type: "rotate",
+										from: "0 18 18",
+										to: "360 18 18",
+										dur: "0.9s",
+										repeatCount: "indefinite" })
+								)
+							)
+						)
+					)
+				);
+			case "phone":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ version: "1.1", id: "Capa_1", xmlns: "http://www.w3.org/2000/svg", x: "0px", y: "0px",
+						viewBox: "0 0 29.731 29.731", style: "enable-background:new 0 0 29.731 29.731;" }, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)("path", { d: "M23.895,29.731c-1.237,0-2.731-0.31-4.374-0.93c-3.602-1.358-7.521-4.042-11.035-7.556\r c-3.515-3.515-6.199-7.435-7.558-11.037C-0.307,6.933-0.31,4.245,0.921,3.015c0.177-0.177,0.357-0.367,0.543-0.563\r c1.123-1.181,2.392-2.51,4.074-2.45C6.697,0.05,7.82,0.77,8.97,2.201c3.398,4.226,1.866,5.732,0.093,7.478l-0.313,0.31\r c-0.29,0.29-0.838,1.633,4.26,6.731c1.664,1.664,3.083,2.882,4.217,3.619c0.714,0.464,1.991,1.166,2.515,0.642l0.315-0.318\r c1.744-1.769,3.25-3.296,7.473,0.099c1.431,1.15,2.15,2.272,2.198,3.433c0.069,1.681-1.27,2.953-2.452,4.075\r c-0.195,0.186-0.385,0.366-0.562,0.542C26.103,29.424,25.126,29.731,23.895,29.731z M5.418,1C4.223,1,3.144,2.136,2.189,3.141\r C1.997,3.343,1.811,3.539,1.628,3.722C0.711,4.638,0.804,7.045,1.864,9.856c1.31,3.472,3.913,7.266,7.33,10.683\r c3.416,3.415,7.208,6.018,10.681,7.327c2.811,1.062,5.218,1.152,6.133,0.237c0.183-0.183,0.379-0.369,0.581-0.56\r c1.027-0.976,2.192-2.082,2.141-3.309c-0.035-0.843-0.649-1.75-1.825-2.695c-3.519-2.83-4.503-1.831-6.135-0.176l-0.32,0.323\r c-0.78,0.781-2.047,0.608-3.767-0.51c-1.193-0.776-2.667-2.038-4.379-3.751c-4.231-4.23-5.584-6.819-4.26-8.146l0.319-0.315\r c1.659-1.632,2.66-2.617-0.171-6.138C7.245,1.651,6.339,1.037,5.496,1.001C5.47,1,5.444,1,5.418,1z" })
+					)
+				);
+			default:
+				return "not found";
+		}
+	}
+};
+
+var Icon = exports.Icon = {
+
+	view: function view(vnode) {
+		var name = vnode.attrs.name;
+
+		switch (name) {
+			case "list":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 511.6 511.6" }),
+					(0, _mithril2.default)("path", { d: "M118.8 201H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 214.3 0 220.8 0 228.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4S126.4 201 118.8 201z" }),
+					(0, _mithril2.default)("path", { d: "M118.8 54.8H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 68.1 0 74.6 0 82.2v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8s8-11.8 8-19.4V82.2c0-7.6-2.7-14.1-8-19.4C132.9 57.5 126.4 54.8 118.8 54.8z" }),
+					(0, _mithril2.default)("path", { d: "M118.8 347.2H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 360.5 0 367 0 374.6v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4S126.4 347.2 118.8 347.2z" }),
+					(0, _mithril2.default)("path", { d: "M484.2 201H210.1c-7.6 0-14.1 2.7-19.4 8s-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4C498.3 203.7 491.8 201 484.2 201z" }),
+					(0, _mithril2.default)("path", { d: "M484.2 347.2H210.1c-7.6 0-14.1 2.7-19.4 8 -5.3 5.3-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4C498.3 349.8 491.8 347.2 484.2 347.2z" }),
+					(0, _mithril2.default)("path", { d: "M503.6 62.8c-5.3-5.3-11.8-8-19.4-8H210.1c-7.6 0-14.1 2.7-19.4 8s-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8s8-11.8 8-19.4V82.2C511.6 74.6 509 68.1 503.6 62.8z" })
+				);
+			//break;
+			case "home":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 39.4 39.4" }),
+					(0, _mithril2.default)("path", { d: "M33.6 21v12.4c0 1.1-0.9 2-2 2H7.8c-1.1 0-2-0.9-2-2V21c0-0.7 0.4-1.3 0.9-1.7l11.9-7.4c0.6-0.4 1.5-0.4 2.1 0l11.9 7.4C33.3 19.6 33.6 20.3 33.6 21zM38.5 15.4L20.8 4.4c-0.6-0.4-1.5-0.4-2.1 0L0.9 15.4c-0.9 0.6-1.2 1.8-0.6 2.8 0.6 0.9 1.8 1.2 2.8 0.6L19.7 8.4l16.6 10.4c0.3 0.2 0.7 0.3 1.1 0.3 0.7 0 1.3-0.3 1.7-0.9C39.7 17.2 39.4 16 38.5 15.4z" })
+				);
+			case "user":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 258.8 258.8" }),
+					(0, _mithril2.default)("circle", { cx: "129.4", cy: "60", r: "60" }),
+					(0, _mithril2.default)("path", { d: "M129.4 150c-60.1 0-108.7 48.7-108.7 108.8h217.5C238.1 198.7 189.4 150 129.4 150z" })
+				);
+			case "search":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, {
+						viewBox: "0 0 250.3 250.3" }),
+					(0, _mithril2.default)("path", { d: "M244.2 214.6l-54.4-54.4c-0.3-0.3-0.6-0.5-0.9-0.8 10.7-16.2 16.9-35.7 16.9-56.6C205.8 46.1 159.7 0 102.9 0S0 46.1 0 102.9c0 56.8 46.1 102.9 102.9 102.9 20.9 0 40.3-6.2 56.6-16.9 0.3 0.3 0.5 0.6 0.8 0.9l54.4 54.4c8.2 8.2 21.4 8.2 29.6 0C252.4 236 252.4 222.8 244.2 214.6zM102.9 170.1c-37.1 0-67.2-30.1-67.2-67.2 0-37.1 30.1-67.2 67.2-67.2 37.1 0 67.2 30.1 67.2 67.2C170.1 140 140 170.1 102.9 170.1z" })
+				);
+			case "search-online":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 512 512" }),
+					(0, _mithril2.default)("path", { d: "M472.2 34.6H39.8C17.8 34.6 0 52.4 0 74.4v45.3c0 3.1 2.5 5.7 5.7 5.7h500.6c3.1 0 5.7-2.5 5.7-5.7V74.4C512 52.4 494.2 34.6 472.2 34.6zM71.8 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8c7.1 0 12.8 5.7 12.8 12.8C84.6 87.1 78.9 92.8 71.8 92.8zM113 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8 12.8 5.7 12.8 12.8C125.8 87.1 120 92.8 113 92.8zM154.1 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8c7.1 0 12.8 5.7 12.8 12.8C166.9 87.1 161.2 92.8 154.1 92.8z" }),
+					(0, _mithril2.default)("path", { d: "M353.3 286.9c-7.2 7.2-7.2 18.9 0 26.1 7.2 7.2 18.9 7.2 26.1 0 7.2-7.2 7.2-18.9 0-26.1C372.2 279.7 360.5 279.7 353.3 286.9z" }),
+					(0, _mithril2.default)("path", { d: "M506.3 148.2H5.7c-3.1 0-5.7 2.5-5.7 5.7v283.7c0 22 17.8 39.8 39.8 39.8h432.4c22 0 39.8-17.8 39.8-39.8V153.8C512 150.7 509.5 148.2 506.3 148.2zM300.2 366.8H90.2c-6.3 0-11.4-5.1-11.4-11.4 0-6.3 5.1-11.4 11.4-11.4h210c6.3 0 11.4 5.1 11.4 11.4C311.5 361.7 306.4 366.8 300.2 366.8zM429.9 363.5c-4.4 4.4-11.6 4.4-16.1 0l-27.5-27.5c-15.8 8.7-35.9 6.3-49.1-6.9 -16.1-16.1-16.1-42.2 0-58.3 16.1-16.1 42.2-16.1 58.3 0 13.3 13.3 15.6 33.4 6.9 49.1l27.5 27.5C434.3 351.8 434.3 359 429.9 363.5z" })
+				);
+			case "front-store-black":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, { viewBox: "0 0 459 459" }),
+					(0, _mithril2.default)("path", { d: "M433.5 25.5h-408v51h408V25.5zM459 280.5v-51L433.5 102h-408L0 229.5v51h25.5v153h255v-153h102v153h51v-153H459zM229.5 382.5h-153v-102h153V382.5z" })
+				);
+			case "shopper-at-store":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 488.2 488.2" }),
+					(0, _mithril2.default)("path", { d: "M340.8 121.2c0 3 2.4 5.4 5.4 5.4h15.9c3 0 5.4-2.4 5.4-5.4V93h-26.8V121.2z" }),
+					(0, _mithril2.default)("path", { d: "M277.1 228c1.9 0.8 3.9 1.1 5.9 1.1 6.6 0 12.9-4 15.4-10.6l12-31.4v5.3h19.3V136.5 94.4v-1.4h-4.9c0 0 0 0 0 0 -8.6 0-14.9 2.8-17.6 10.1L267.6 206.7c-0.9 2.3-1.1 4.6-1 6.9 4.3 3.7 7.7 8.4 9.7 13.9C276.6 227.6 276.8 227.9 277.1 228z" }),
+					(0, _mithril2.default)("path", { d: "M354.2 78.7c19 0 34.4-17.6 34.4-39.3C388.6 17.6 373.2 0 354.2 0c-19 0-34.4 17.6-34.4 39.3C319.8 61.1 335.2 78.7 354.2 78.7z" }),
+					(0, _mithril2.default)("path", { d: "M131.5 154c20 0 36.3-18.6 36.3-41.5 0-22.9-16.2-41.5-36.3-41.5 -20 0-36.2 18.6-36.2 41.5C95.3 135.4 111.5 154 131.5 154z" }),
+					(0, _mithril2.default)("path", { d: "M398.2 187.5l11.8 31c2.5 6.6 8.8 10.6 15.4 10.6 2 0 3.9-0.3 5.9-1.1 8.5-3.2 12.8-12.8 9.6-21.3l-39.5-103.5c-2.8-7.3-9.7-10.1-17.6-10.1h-4.9v99.3h19.3L398.2 187.5z" }),
+					(0, _mithril2.default)("path", { d: "M469.2 234.8h-71l-0.1-30.9h-13.2v25.6c0 2-0.8 3.8-2 5.3h-57.5c-1.2-1.5-2-3.3-2-5.3v-25.6h-13.1v30.9h-32.2c0 0.2 0.1 0.3 0.1 0.5 1.7 14-5.4 27.1-16.9 33.7h190.7v79.1H432.9v-15.1c0-6.3-5.1-11.4-11.4-11.4h-17.7v-14c0-6.3-5.1-11.4-11.4-11.4h-39.5c-6.3 0-11.4 5.1-11.4 11.4v14h-13.6c-6.3 0-11.4 5.1-11.4 11.4v15.1h-37.2v-15.1c0-6.3-5.1-11.4-11.4-11.4h-34.4c-6.3 0-11.4 5.1-11.4 11.4v15.1h-44.4l0.3-79.1v-33.2l12.4 18.2c3.3 4.8 8.7 7.6 14.4 7.6 0.7 0 1.4 0 2.1-0.1l39.8-4.8c9.5-1.1 16.3-9.8 15.2-19.4 -1.2-9.5-9.6-16.4-19.4-15.2l-29.3 3.5 -33.7-49.4c-4.1-6.1-10.7-7.1-18.2-7.1h-60.5c-8.8 0-16 3.1-18.8 11L42 289.7c-2.8 7.8 0.5 16 7.1 20.3v35.9H13.3c-3.9 0-7.5 2-9.6 5.2 -2.1 3.3-2.4 7.4-0.8 10.9l23.9 53c1.8 4.1 5.9 6.7 10.4 6.7h48.4v45.6c0 11.5 9.3 20.9 20.9 20.9 11.5 0 20.9-9.3 20.9-20.9V349.5h8.3v117.8c0 11.5 9.4 20.9 20.9 20.9 11.5 0 20.9-9.3 20.9-20.9v-5.1h288.3c11.3 0 20.6-9.2 20.6-20.6V251.9C486.3 242.4 478.7 234.8 469.2 234.8zM66.3 345.9v-35c3.8-1.9 6.9-5.1 8.5-9.4l10.6-29.2 0.4 73.6H66.3zM452.1 428.1h-48.3v-7.6c0-6.3-5.1-11.4-11.4-11.4h-24.8v-9.8c0-6.3-5.1-11.4-11.4-11.4h-57.3c-6.3 0-11.4 5.1-11.4 11.4v28.8h-36.9v-17.1c0-6.3-5.1-11.4-11.4-11.4h-37.5c-6.3 0-11.4 5.1-11.4 11.4v17.1h-12.7v-62.9h274.6V428.1z" })
+				);
+			case "close":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, {
+						viewBox: "0 0 23.3 23.3" }),
+					(0, _mithril2.default)("path", { d: "M16 11.7L22.6 5.1c1-1 1-2.5 0-3.5l-0.9-0.9c-1-1-2.5-1-3.5 0L11.7 7.3 5.1 0.7c-1-1-2.5-1-3.5 0L0.7 1.6c-1 1-1 2.5 0 3.5l6.6 6.6 -6.6 6.6c-1 1-1 2.5 0 3.5l0.9 0.9c1 1 2.5 1 3.5 0l6.6-6.6 6.6 6.6c1 1 2.5 1 3.5 0l0.9-0.9c1-1 1-2.5 0-3.5L16 11.7z" })
+				);
+			case "location":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 54.8 54.8" }),
+					(0, _mithril2.default)("path", { d: "M27.6 12c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7S31.4 12 27.6 12zM27.6 24c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5S30.3 24 27.6 24z" }),
+					(0, _mithril2.default)("path", { d: "M40.9 5.6C37.3 2 32.5 0 27.4 0c-5.1 0-9.9 2-13.6 5.6 -6.7 6.7-7.5 19.3-1.8 27L27.4 54.8 42.7 32.6C48.5 24.9 47.6 12.3 40.9 5.6zM41.1 31.4L27.4 51.2 13.6 31.4C8.4 24.5 9.2 13.1 15.2 7 18.5 3.8 22.8 2 27.4 2s8.9 1.8 12.1 5C45.6 13.1 46.3 24.5 41.1 31.4z" })
+				);
+			case "add-to-list":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 100 100" }),
+					(0, _mithril2.default)("path", { d: "M40 50c0 2.8-2.2 5-5 5H5c-2.8 0-5-2.2-5-5s2.2-5 5-5h30C37.8 45 40 47.2 40 50zM35 65H5c-2.8 0-5 2.2-5 5s2.2 5 5 5h30c2.8 0 5-2.2 5-5S37.8 65 35 65zM97 45H80V28c0-2.8-2.2-3-5-3s-5 0.2-5 3v17H53.5c-2.8 0-3 2.2-3 5s0.2 5 3 5H70v17c0 2.8 2.2 3 5 3s5-0.2 5-3V55h17c2.8 0 3-2.2 3-5S99.8 45 97 45zM35 25H5c-2.8 0-5 2.2-5 5s2.2 5 5 5h30c2.8 0 5-2.2 5-5S37.8 25 35 25z" })
+				);
+			case "cart":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 100 90" }),
+					(0, _mithril2.default)("path", { d: "M43.5 72.8c-2.6 0-4.7 2.1-4.7 4.8 0 2.6 2.1 4.8 4.8 4.8s4.8-2.1 4.8-4.7C48.3 74.9 46.1 72.8 43.5 72.8zM72.3 72.8c-2.6 0-4.7 2.1-4.7 4.8 0 2.6 2.1 4.8 4.8 4.8s4.8-2.1 4.8-4.7C77.1 74.9 75 72.8 72.3 72.8zM29.5 29.5l-3.8-11.7H5.4l2 7h13.2l14.3 43.6H81.4l13.3-38.9H29.5z" })
+				);
+			default:
+				return "";
+		}
 	}
 };
 
