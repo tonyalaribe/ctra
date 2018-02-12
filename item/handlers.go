@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/asdine/storm"
+	"github.com/blevesearch/bleve"
 	"github.com/tonyalaribe/ctra/config"
 
 	"github.com/btshopng/btshopng/messages"
@@ -62,7 +63,6 @@ type Item struct {
 		NameOfNextOfKin           string `json:"NameOfNextOfKin"`
 		RelationshipWithNextOfKin string `json:"RelationshipWithNextOfKin"`
 		PhoneNumberOfNextOfKin    string `json:"PhoneNumberOfNextOfKin"`
-		PhotographOfVehicle       string `json:"PhotographOfVehicle"`
 		DriversPhotograph         string `json:"DriversPhotograph"`
 		DriversThumbprint         string `json:"DriversThumbprint"`
 	} `json:"DriversBio"`
@@ -91,6 +91,7 @@ type Item struct {
 		ChasisNumber         string `json:"ChasisNumber"`
 		EngineNumber         string `json:"EngineNumber"`
 		InsuranceNumber      string `json:"InsuranceNumber"`
+		PhotographOfVehicle  string `json:"PhotographOfVehicle"`
 	} `json:"VehicleDetails"`
 }
 
@@ -104,9 +105,39 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, messages.ErrInternalServer)
 		return
 	}
-	
-	// check if each field is not empty...
 
+	// check if each field is not empty...
+	if item.MetaData.FormNumber == "" || item.MetaData.SlotNumber == "" {
+		render.Status(r, 401)
+		render.JSON(w, r, messages.ErrBadToken)
+		return
+	}
+	if item.VehicleOwnersBio.OwnersPassport == "" || item.VehicleOwnersBio.FirstName == "" ||
+		item.VehicleOwnersBio.LastName == "" || item.VehicleOwnersBio.PhoneNumbers == "" {
+		render.Status(r, 401)
+		render.JSON(w, r, messages.ErrBadToken)
+		return
+	}
+	if item.DriversBio.FirstName == "" || item.DriversBio.LastName == "" ||
+		item.DriversBio.DriversPhotograph == "" || item.DriversBio.PhoneNumbers == "" {
+		render.Status(r, 401)
+		render.JSON(w, r, messages.ErrBadToken)
+		return
+	}
+	if item.GuarantorsBio.FirstName == "" || item.GuarantorsBio.LastName == "" ||
+		item.GuarantorsBio.PhoneNumbers == "" || item.GuarantorsBio.GuarantorsPassport == "" {
+		render.Status(r, 401)
+		render.JSON(w, r, messages.ErrBadToken)
+		return
+	}
+	if item.VehicleDetails.RegistrationNumber == "" || item.VehicleDetails.TypeOfVehicle == "" ||
+		item.VehicleDetails.VehicleLicenseNumber == "" || item.VehicleDetails.ChasisNumber == "" ||
+		item.VehicleDetails.EngineNumber == "" || item.VehicleDetails.InsuranceNumber == "" ||
+		item.VehicleDetails.PhotographOfVehicle == "" {
+		render.Status(r, 401)
+		render.JSON(w, r, messages.ErrBadToken)
+		return
+	}
 	item.CreatedAt = time.Now()
 	item.ModifiedAt = time.Now()
 	item.LastRenewedAt = time.Now()
@@ -139,7 +170,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, messages.ErrInternalServer)
 		return
 	}
-
+	conf.BleveIndexes["items"].Index(strconv.Itoa(item.ID), item)
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, messages.Success)
 }
@@ -181,4 +212,50 @@ func GetOne(w http.ResponseWriter, r *http.Request) {
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, item)
+}
+
+func Search(w http.ResponseWriter, r *http.Request) {
+	q := chi.URLParam(r, "q")
+	if len(q) < 1 {
+		log.Println("query small o: ", q)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, messages.ErrInternalServer)
+		return
+	}
+	log.Println(q)
+	items := []Item{}
+	conf := config.Get()
+
+	query := bleve.NewQueryStringQuery(q)
+	searchRequest := bleve.NewSearchRequest(query)
+	log.Println("Search request created...")
+	searchResult, err := conf.BleveIndexes["items"].Search(searchRequest)
+	if err != nil {
+		log.Println(err)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, messages.ErrInternalServer)
+		return
+	}
+	log.Println(searchResult.Hits)
+	if len(searchResult.Hits) > 0 {
+		for _, v := range searchResult.Hits {
+			log.Println(v.ID)
+			item := Item{}
+			err = conf.Storm.One("ID", v.ID, &item)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			items = append(items, item)
+		}
+	}
+	// err = conf.Storm.
+	// if err != nil {
+	// 	log.Println(err)
+	// 	render.Status(r, http.StatusInternalServerError)
+	// 	render.JSON(w, r, messages.ErrInternalServer)
+	// 	return
+	// }
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, items)
 }

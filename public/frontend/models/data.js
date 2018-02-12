@@ -1,5 +1,5 @@
 import m from "mithril";
-import izitoast from "iziToast";
+import izitoast from "izitoast";
 
 export var Data = {
 	data: {
@@ -16,6 +16,13 @@ export var Data = {
 		DriversBio: {},
 		GuarantorsBio: {},
 		VehicleDetails: {}
+	},
+	searchquery:"",
+	Search: function(){
+		return m.request({
+			url:"api/items/search"+Data.searchquery,
+			method: "GET",
+		})
 	},
 	Submit: function() {
 		console.log(Data.data);

@@ -14,13 +14,13 @@ export var DriversBio = {
 						<ImageInput
 							label="Drivers Photograph"
 							class=" dib w-50 "
-              Value={Data.data.DriversBio.DriversPhotograph}
+							Value={Data.data.DriversBio.DriversPhotograph}
 							Callback={v => (Data.data.DriversBio.DriversPhotograph = v)}
 						/>
 						<ImageInput
 							label="Drivers Thumbprint"
 							class=" dib w-50 "
-              Value={Data.data.DriversBio.DriversThumbprint}
+							Value={Data.data.DriversBio.DriversThumbprint}
 							Callback={v => (Data.data.DriversBio.DriversThumbprint = v)}
 						/>
 					</div>

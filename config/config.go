@@ -58,11 +58,19 @@ func Init() {
 	}
 	config.Storm = db
 
+	config.BleveIndexes = make(map[string]bleve.Index)
+	config.BleveIndexes["items"], err = bleve.New("database/items.bleve", bleve.NewIndexMapping())
+	if err != nil {
+		log.Println(err)
+		config.BleveIndexes["items"], err = bleve.Open("database/items.bleve")
+		if err != nil {
+			log.Println(err)
+		}
+	}
 	// err = BleveInit(&config, dbPath)
 	// if err != nil {
 	// 	log.Println(err)
 	// }
-
 }
 
 func Get() *Conf {

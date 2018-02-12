@@ -1,6 +1,7 @@
 import m from "mithril";
 import flatpickr from "flatpickr";
 import {SVGIcons} from "../../shared/components/svgIcons";
+import {Data} from "../models/data";
 
 export var Shell = {
 	oncreate: function() {
@@ -30,16 +31,25 @@ export var Shell = {
 									class="bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib"
 									placeholder="form number, name, slot number, etc"
 									style="outline: none"
+									oninput={m.withAttr("value", function(value){
+										Data.searchquery = value;
+									})}
 								/>
 								<p class="mv0 dib w1 h1 absolute pointer" style="top: 0.5rem; right:0.5rem"
-								onclick={()=>{
+								onclick={() => {
 									console.log("Search button clicked")
+									Data.Search()
+									.then(function(resp){
+										console.log(resp);
+									}).catch(function(err){
+										console.log(err);
+									})
 								}}>
 									<SVGIcons type="search"/>
 								</p>
 							</form>
 						</div>
-						<div class="dib fr pv2 ">
+						<div class="dib fr pv2">
 							<a
 								class="bw0 bg-dark-red shadow-4 pv2 ph3  br2 white-90 pointer grow link"
 								style="background-color:#5889FF"
