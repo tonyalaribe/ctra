@@ -11,10 +11,10 @@ export var VehicleDetails = {
 					<legend class="ph2">Vehicle Details</legend>
 					<div class="tc dib w-100">
 						<ImageInput
-							label="Drivers Photograph"
+							label="Vehicle's Photograph"
 							class=" dib w-50 "
-							Value={Data.data.DriversBio.PhotographOfVehicle}
-							Callback={v => (Data.data.DriversBio.PhotographOfVehicle = v)}
+							Value={Data.data.VehicleDetails.PhotographOfVehicle}
+							Callback={v => (Data.data.VehicleDetails.PhotographOfVehicle = v)}
 						/>
 					</div>
 					<TextInput
