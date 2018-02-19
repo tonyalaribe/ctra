@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1324,7 +1324,7 @@ m.vnode = Vnode
 if (true) module["exports"] = m
 else window.m = m
 }());
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7).setImmediate, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8).setImmediate, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
@@ -1342,7 +1342,7 @@ var _mithril = __webpack_require__(0);
 
 var _mithril2 = _interopRequireDefault(_mithril);
 
-var _izitoast = __webpack_require__(23);
+var _izitoast = __webpack_require__(6);
 
 var _izitoast2 = _interopRequireDefault(_izitoast);
 
@@ -1373,7 +1373,7 @@ var Data = exports.Data = {
 	},
 	Submit: function Submit() {
 		console.log(Data.data);
-		console.log(JSON.stringify(Data.data));
+		// console.log(JSON.stringify(Data.data));
 
 		return _mithril2.default.request({
 			method: "POST",
@@ -3658,2729 +3658,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _HomePage = __webpack_require__(10);
-
-var _NewDriverPage = __webpack_require__(12);
-
-var _ViewItem = __webpack_require__(19);
-
-var _Shell = __webpack_require__(20);
-
-var _data = __webpack_require__(1);
-
-var _analytics = __webpack_require__(21);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var root = document.getElementById("appContainer");
-
-_mithril2.default.route.prefix("#!");
-
-_mithril2.default.route(root, "/", {
-	"/": {
-		view: function view(vnode) {
-			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_HomePage.HomePage, vnode.attrs));
-		}
-	},
-	"/registration": {
-		view: function view(vnode) {
-			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_NewDriverPage.NewDriverPage, vnode.attrs));
-		}
-	},
-	"/item/:id": {
-		view: function view(vnode) {
-			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_ViewItem.ViewItem, vnode.attrs));
-		}
-	},
-	"/analytics": {
-		view: function view(vnode) {
-			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_analytics.Analytics, vnode.attrs));
-		}
-	}
-});
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(8);
-// On some exotic environments, it's not clear which object `setimmeidate` was
-// able to install onto.  Search each possibility in the same order as the
-// `setimmediate` library.
-exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
-                       (typeof global !== "undefined" && global.setImmediate) ||
-                       (this && this.setImmediate);
-exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
-                         (typeof global !== "undefined" && global.clearImmediate) ||
-                         (this && this.clearImmediate);
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
-    "use strict";
-
-    if (global.setImmediate) {
-        return;
-    }
-
-    var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
-    var currentlyRunningATask = false;
-    var doc = global.document;
-    var registerImmediate;
-
-    function setImmediate(callback) {
-      // Callback can either be a function or a string
-      if (typeof callback !== "function") {
-        callback = new Function("" + callback);
-      }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
-      // Store and register the task
-      var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
-      registerImmediate(nextHandle);
-      return nextHandle++;
-    }
-
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
-
-    function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
-    }
-
-    function runIfPresent(handle) {
-        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-        // So if we're currently running a task, we'll need to delay this invocation.
-        if (currentlyRunningATask) {
-            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-            // "too much recursion" error.
-            setTimeout(runIfPresent, 0, handle);
-        } else {
-            var task = tasksByHandle[handle];
-            if (task) {
-                currentlyRunningATask = true;
-                try {
-                    run(task);
-                } finally {
-                    clearImmediate(handle);
-                    currentlyRunningATask = false;
-                }
-            }
-        }
-    }
-
-    function installNextTickImplementation() {
-        registerImmediate = function(handle) {
-            process.nextTick(function () { runIfPresent(handle); });
-        };
-    }
-
-    function canUsePostMessage() {
-        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-        // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = global.onmessage;
-            global.onmessage = function() {
-                postMessageIsAsynchronous = false;
-            };
-            global.postMessage("", "*");
-            global.onmessage = oldOnMessage;
-            return postMessageIsAsynchronous;
-        }
-    }
-
-    function installPostMessageImplementation() {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-        var messagePrefix = "setImmediate$" + Math.random() + "$";
-        var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
-            }
-        };
-
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
-
-        registerImmediate = function(handle) {
-            global.postMessage(messagePrefix + handle, "*");
-        };
-    }
-
-    function installMessageChannelImplementation() {
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function(event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
-
-        registerImmediate = function(handle) {
-            channel.port2.postMessage(handle);
-        };
-    }
-
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
-    function installSetTimeoutImplementation() {
-        registerImmediate = function(handle) {
-            setTimeout(runIfPresent, 0, handle);
-        };
-    }
-
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        installNextTickImplementation();
-
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
-
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
-        installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
-
-    } else {
-        // For older browsers
-        installSetTimeoutImplementation();
-    }
-
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(9)))
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.HomePage = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _flatpickr = __webpack_require__(5);
-
-var _flatpickr2 = _interopRequireDefault(_flatpickr);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var HomePage = exports.HomePage = {
-	oncreate: function oncreate() {
-		_data.Data.GetAll();
-		(0, _flatpickr2.default)(document.getElementById("fromDate"), {});
-		(0, _flatpickr2.default)(document.getElementById("toDate"), {});
-	},
-	view: function view() {
-		return (0, _mithril2.default)(
-			"section",
-			{ "class": "tc ph6 pb5 ", style: "min-height:90vh" },
-			(0, _mithril2.default)(
-				"div",
-				{ "class": "bg-gray cf pa3" },
-				(0, _mithril2.default)(
-					"button",
-					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
-					"Refresh List"
-				)
-			),
-			(0, _mithril2.default)(
-				"table",
-				{ "class": "f6 w-100  center ba b--black-20 bg-white", cellspacing: "0" },
-				(0, _mithril2.default)(
-					"thead",
-					{ "class": "tc" },
-					(0, _mithril2.default)(
-						"tr",
-						{ "class": "bg-near-white" },
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"S/N"
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Name"
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Reg. No."
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Vehicle No."
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Form No."
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Actions"
-						)
-					)
-				),
-				(0, _mithril2.default)(
-					"tbody",
-					{ "class": "lh-copy" },
-					_data.Data.items.map(function (item) {
-						return (0, _mithril2.default)(
-							"tr",
-							null,
-							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.ID
-							),
-							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.DriversBio.FirstName + " " + item.DriversBio.LastName
-							),
-							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.VehicleDetails.RegistrationNumber
-							),
-							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.VehicleDetails.VehicleLicenseNumber
-							),
-							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.MetaData.FormNumber
-							),
-							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								(0, _mithril2.default)(
-									"a",
-									{
-										"class": "link bg-green white pv2 ph3 br2 pointer",
-										oncreate: _mithril2.default.route.link,
-										href: "/item/" + item.ID
-									},
-									"view"
-								)
-							)
-						);
-					})
-				)
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 11 */,
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.NewDriverPage = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _FormWizard = __webpack_require__(13);
-
-var _data = __webpack_require__(1);
-
-var _izitoast = __webpack_require__(23);
-
-var _izitoast2 = _interopRequireDefault(_izitoast);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var NewDriverPage = exports.NewDriverPage = {
-	oncreate: function oncreate() {},
-	view: function view() {
-		return (0, _mithril2.default)(
-			"section",
-			{ "class": "tc ph6 " },
-			(0, _mithril2.default)(
-				"div",
-				{ "class": "bg-gray cf pa3" },
-				(0, _mithril2.default)(
-					"button",
-					{
-						"class": "fr pv2 ph3 bg-white shadow-4 ",
-						onclick: function onclick() {
-							return _data.Data.Submit();
-						}
-					},
-					"Save"
-				)
-			),
-			(0, _mithril2.default)(
-				"section",
-				{ "class": "pv3" },
-				(0, _mithril2.default)(_FormWizard.FormWizard, null)
-			),
-			(0, _mithril2.default)(
-				"div",
-				{ "class": "bg-gray cf pa3" },
-				(0, _mithril2.default)(
-					"button",
-					{
-						"class": "fr pv2 ph3 bg-white shadow-4 ",
-						onclick: function onclick() {
-							var f = _data.Data.data;
-							if (!f.MetaData.FormNumber || !f.MetaData.SlotNumber) {
-								_izitoast2.default.error({
-									title: "Error",
-									message: "Please fill out the Meta Data",
-									position: "topCenter"
-								});
-								return;
-							}
-							if (!f.VehicleOwnersBio.FirstName || !f.VehicleOwnersBio.LastName || !f.VehicleOwnersBio.OtherName || !f.VehicleOwnersBio.Gender || !f.VehicleOwnersBio.DateOfBirth || !f.VehicleOwnersBio.MaritalStatus || !f.VehicleOwnersBio.OfficeAddress || !f.VehicleOwnersBio.ResidentialAddress || !f.VehicleOwnersBio.PhoneNumbers || !f.VehicleOwnersBio.Occupation || !f.VehicleOwnersBio.Religion || !f.VehicleOwnersBio.LocalGovernmentOfOrigin || !f.VehicleOwnersBio.StateOfOrigin || !f.VehicleOwnersBio.Nationality || !f.VehicleOwnersBio.NameOfNextOfKin || !f.VehicleOwnersBio.RelationshipWithNextOfKin || !f.VehicleOwnersBio.PhoneNumberOfNextOfKin || !f.VehicleOwnersBio.OwnersPassport) {
-								_izitoast2.default.error({
-									title: "Error",
-									message: "Please fill Vehicle Owner's Data",
-									position: "topCenter"
-								});
-								return;
-							}
-							if (!f.DriversBio.FirstName || !f.DriversBio.LastName || !f.DriversBio.OtherName || !f.DriversBio.Gender || !f.DriversBio.DateOfBirth || !f.DriversBio.MaritalStatus || !f.DriversBio.OfficeAddress || !f.DriversBio.ResidentialAddress || !f.DriversBio.PhoneNumbers || !f.DriversBio.Occupation || !f.DriversBio.Religion || !f.DriversBio.LocalGovernmentOfOrigin || !f.DriversBio.StateOfOrigin || !f.DriversBio.Nationality || !f.DriversBio.NameOfNextOfKin || !f.DriversBio.RelationshipWithNextOfKin || !f.DriversBio.PhoneNumberOfNextOfKin || !f.DriversBio.DriversPhotograph
-							// !f.DriversBio.DriversThumbprint
-							) {
-									_izitoast2.default.error({
-										title: "Error",
-										message: "Please fill out the Driver's Bio Data",
-										position: "topCenter"
-									});
-									return;
-								}
-							if (!f.GuarantorsBio.FirstName || !f.GuarantorsBio.LastName || !f.GuarantorsBio.OtherName || !f.GuarantorsBio.Gender || !f.GuarantorsBio.DateOfBirth || !f.GuarantorsBio.MaritalStatus || !f.GuarantorsBio.OfficeAddress || !f.GuarantorsBio.ResidentialAddress || !f.GuarantorsBio.PhoneNumbers || !f.GuarantorsBio.Occupation || !f.GuarantorsBio.Religion || !f.GuarantorsBio.LocalGovernmentOfOrigin || !f.GuarantorsBio.StateOfOrigin || !f.GuarantorsBio.Nationality || !f.GuarantorsBio.GuarantorsPassport || !f.GuarantorsBio.GuarantorsIdentity) {
-								_izitoast2.default.error({
-									title: "Error",
-									message: "Please fill out the Guarantor's Bio Data",
-									position: "topCenter"
-								});
-								return;
-							}
-							if (!f.VehicleDetails.RegistrationNumber || !f.VehicleDetails.TypeOfVehicle || !f.VehicleDetails.VehicleLicenseNumber || !f.VehicleDetails.ChasisNumber || !f.VehicleDetails.EngineNumber || !f.VehicleDetails.InsuranceNumber || !f.VehicleDetails.PhotographOfVehicle) {
-								_izitoast2.default.error({
-									title: "Error",
-									message: "Please fill out the Guarantor's Bio Data",
-									position: "topCenter"
-								});
-								return;
-							}
-							// add loader here...
-							_data.Data.Submit();
-						}
-					},
-					"Save"
-				)
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.FormWizard = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _MetaData = __webpack_require__(14);
-
-var _VehicleOwnersBio = __webpack_require__(15);
-
-var _DriversBio = __webpack_require__(16);
-
-var _GuarantorsBio = __webpack_require__(17);
-
-var _VehicleDetails = __webpack_require__(18);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var FormWizard = exports.FormWizard = {
-	start: 0,
-	view: function view() {
-		return (0, _mithril2.default)(
-			"section",
-			null,
-			(0, _mithril2.default)(_MetaData.MetaData, null),
-			(0, _mithril2.default)(_VehicleDetails.VehicleDetails, null),
-			(0, _mithril2.default)(_VehicleOwnersBio.VehicleOwnersBio, null),
-			(0, _mithril2.default)(_DriversBio.DriversBio, null),
-			(0, _mithril2.default)(_GuarantorsBio.GuarantorsBio, null)
-		);
-	}
-};
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.MetaData = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _TextInput = __webpack_require__(2);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var MetaData = exports.MetaData = {
-	view: function view() {
-		return (0, _mithril2.default)(
-			"div",
-			{ "class": "mv4 pv4" },
-			(0, _mithril2.default)(
-				"fieldset",
-				null,
-				(0, _mithril2.default)(
-					"legend",
-					{ "class": "ph2" },
-					"Registration Meta Data"
-				),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Form Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.MetaData.FormNumber = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Slot Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.MetaData.SlotNumber = v;
-					})
-				})
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.VehicleOwnersBio = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _TextInput = __webpack_require__(2);
-
-var _ImageInput = __webpack_require__(4);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var VehicleOwnersBio = exports.VehicleOwnersBio = {
-	view: function view() {
-		return (0, _mithril2.default)(
-			"div",
-			{ "class": "mv4 pv4" },
-			(0, _mithril2.default)(
-				"fieldset",
-				null,
-				(0, _mithril2.default)(
-					"legend",
-					{ "class": "ph2" },
-					"Vehicle Owner's Bio"
-				),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "tc dib w-100" },
-					(0, _mithril2.default)(_ImageInput.ImageInput, {
-						label: "Owners Passport",
-						"class": " dib w-50 ",
-						Value: _data.Data.data.VehicleOwnersBio.OwnersPassport,
-						Callback: function Callback(v) {
-							return _data.Data.data.VehicleOwnersBio.OwnersPassport = v;
-						}
-					})
-				),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "First Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.FirstName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Last Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.LastName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Other Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.OtherName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Gender",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.Gender = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Date of Birth",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.DateOfBirth = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Marital Status",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.MaritalStatus = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Office Address",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.OfficeAddress = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Residential Address",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.ResidentialAddress = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Phone Numbers",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.PhoneNumbers = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Occupation",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.Occupation = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Religion",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.Religion = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "L.G.A. of Origin",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.LocalGovernmentOfOrigin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "State of Origin",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.StateOfOrigin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Nationality",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.Nationality = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Name of NOK",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.NameOfNextOfKin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Relationship with NOK",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.RelationshipWithNextOfKin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Phone Number of NOK",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleOwnersBio.PhoneNumberOfNextOfKin = v;
-					})
-				})
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.DriversBio = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _TextInput = __webpack_require__(2);
-
-var _ImageInput = __webpack_require__(4);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var DriversBio = exports.DriversBio = {
-	view: function view() {
-		return (0, _mithril2.default)(
-			"div",
-			{ "class": "mv4 pv4" },
-			(0, _mithril2.default)(
-				"fieldset",
-				null,
-				(0, _mithril2.default)(
-					"legend",
-					{ "class": "ph2" },
-					"Driver's Bio"
-				),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "tc dib w-100" },
-					(0, _mithril2.default)(_ImageInput.ImageInput, {
-						label: "Drivers Photograph",
-						"class": " dib w-50 ",
-						Value: _data.Data.data.DriversBio.DriversPhotograph,
-						Callback: function Callback(v) {
-							return _data.Data.data.DriversBio.DriversPhotograph = v;
-						}
-					}),
-					(0, _mithril2.default)(_ImageInput.ImageInput, {
-						label: "Drivers Thumbprint",
-						"class": " dib w-50 ",
-						Value: _data.Data.data.DriversBio.DriversThumbprint,
-						Callback: function Callback(v) {
-							return _data.Data.data.DriversBio.DriversThumbprint = v;
-						}
-					})
-				),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "First Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.FirstName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Last Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.LastName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Other Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.OtherName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Gender",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.Gender = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Date of Birth",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.DateOfBirth = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Marital Status",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.MaritalStatus = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Office Address",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.OfficeAddress = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Residential Address",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.ResidentialAddress = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Phone Numbers",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.PhoneNumbers = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Occupation",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.Occupation = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Religion",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.Religion = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "L.G.A. of Origin",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.LocalGovernmentOfOrigin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "State of Origin",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.StateOfOrigin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Nationality",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.Nationality = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Name of NOK",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.NameOfNextOfKin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Relationship with NOK",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.RelationshipWithNextOfKin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Phone Number of NOK",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.DriversBio.PhoneNumberOfNextOfKin = v;
-					})
-				})
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.GuarantorsBio = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _TextInput = __webpack_require__(2);
-
-var _ImageInput = __webpack_require__(4);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var GuarantorsBio = exports.GuarantorsBio = {
-	view: function view() {
-		return (0, _mithril2.default)(
-			"div",
-			{ "class": "mv4 pv4" },
-			(0, _mithril2.default)(
-				"fieldset",
-				null,
-				(0, _mithril2.default)(
-					"legend",
-					{ "class": "ph2" },
-					"Guarantor's Bio"
-				),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "tc dib w-100" },
-					(0, _mithril2.default)(_ImageInput.ImageInput, {
-						label: "Guarantors Passport",
-						"class": " dib w-50 ",
-						Value: _data.Data.data.GuarantorsBio.GuarantorsPassport,
-						Callback: function Callback(v) {
-							return _data.Data.data.GuarantorsBio.GuarantorsPassport = v;
-						}
-					}),
-					(0, _mithril2.default)(_ImageInput.ImageInput, {
-						label: "Guarantors Identity",
-						"class": " dib w-50 ",
-						Value: _data.Data.data.GuarantorsBio.GuarantorsIdentity,
-						Callback: function Callback(v) {
-							return _data.Data.data.GuarantorsBio.GuarantorsIdentity = v;
-						}
-					})
-				),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "First Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.FirstName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Last Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.LastName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Other Name",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.OtherName = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Gender",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.Gender = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Date of Birth",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.DateOfBirth = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Marital Status",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.MaritalStatus = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Office Address",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.OfficeAddress = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Residential Address",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.ResidentialAddress = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Phone Numbers",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.PhoneNumbers = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Occupation",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.Occupation = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Religion",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.Religion = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "L.G.A. of Origin",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.LocalGovernmentOfOrigin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "State of Origin",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.StateOfOrigin = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Nationality",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.GuarantorsBio.Nationality = v;
-					})
-				})
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.VehicleDetails = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _TextInput = __webpack_require__(2);
-
-var _ImageInput = __webpack_require__(4);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var VehicleDetails = exports.VehicleDetails = {
-	view: function view() {
-		return (0, _mithril2.default)(
-			"div",
-			{ "class": "mv4 pv4" },
-			(0, _mithril2.default)(
-				"fieldset",
-				null,
-				(0, _mithril2.default)(
-					"legend",
-					{ "class": "ph2" },
-					"Vehicle Details"
-				),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "tc dib w-100" },
-					(0, _mithril2.default)(_ImageInput.ImageInput, {
-						label: "Vehicle's Photograph",
-						"class": " dib w-50 ",
-						Value: _data.Data.data.VehicleDetails.PhotographOfVehicle,
-						Callback: function Callback(v) {
-							return _data.Data.data.VehicleDetails.PhotographOfVehicle = v;
-						}
-					})
-				),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Registration Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleDetails.RegistrationNumber = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Type of Vehicle",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleDetails.TypeOfVehicle = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Vehicle License Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleDetails.VehicleLicenseNumber = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Chasis Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleDetails.ChasisNumber = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Engine Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleDetails.EngineNumber = v;
-					})
-				}),
-				(0, _mithril2.default)(_TextInput.TextInput, {
-					label: "Insurance Number",
-					"class": "dib w-50",
-					oninput: _mithril2.default.withAttr("value", function (v) {
-						return _data.Data.data.VehicleDetails.InsuranceNumber = v;
-					})
-				})
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.ViewItem = undefined;
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var ViewItem = exports.ViewItem = {
-	oncreate: function oncreate(vnode) {
-		console.log(vnode.attrs.id);
-		_data.Data.GetOne(vnode.attrs.id);
-	},
-	view: function view() {
-		var vo_data = _data.Data.item.VehicleOwnersBio;
-		var VehicleOwnersBio = {
-			Name: vo_data.FirstName + " " + vo_data.LastName,
-			Gender: vo_data.Gender,
-			"Date of Birth": vo_data.DateOfBirth,
-			"Marital Status": vo_data.MaritalStatus,
-			"Office Address": vo_data.OfficeAddress,
-			"Residential Address": vo_data.ResidentialAddress,
-			"Phone Numbers": vo_data.PhoneNumbers,
-			Occupation: vo_data.Occupation,
-			Religion: vo_data.Religion,
-			"L.G.A. of Origin": vo_data.LocalGovernmentOfOrigin,
-			"State of Origin": vo_data.StateOfOrigin,
-			Nationality: vo_data.Nationality,
-			"Name of NOK": vo_data.NOK,
-			"Relationship with NOK": vo_data.RelationshipWithNextOfKin,
-			"Phone Number of NOK": vo_data.PhoneNumberOfNextOfKin
-		};
-
-		var drivers_data = _data.Data.item.DriversBio;
-		var DriversBio = {
-			Name: drivers_data.FirstName + " " + drivers_data.LastName,
-			Gender: drivers_data.Gender,
-			"Date of Birth": drivers_data.DateOfBirth,
-			"Marital Status": drivers_data.MaritalStatus,
-			"Office Address": drivers_data.OfficeAddress,
-			"Residential Address": drivers_data.ResidentialAddress,
-			"Phone Numbers": drivers_data.PhoneNumbers,
-			Occupation: drivers_data.Occupation,
-			Religion: drivers_data.Religion,
-			"L.G.A. of Origin": drivers_data.LocalGovernmentOfOrigin,
-			"State of Origin": drivers_data.StateOfOrigin,
-			Nationality: drivers_data.Nationality,
-			"Name of NOK": drivers_data.NOK,
-			"Relationship with NOK": drivers_data.RelationshipWithNextOfKin,
-			"Phone Number of NOK": drivers_data.PhoneNumberOfNextOfKin
-		};
-
-		var v_data = _data.Data.item.VehicleDetails;
-		var VehicleParticulars = {
-			"Registration Number": v_data.RegistrationNumber,
-			"Type of Vehicle": v_data.TypeOfVehicle,
-			"Vehicle License Number": v_data.VehicleLicenseNumber,
-			"Chasis Number": v_data.ChasisNumber,
-			"Engine Number": v_data.EngineNumber,
-			"Insurance Number": v_data.InsuranceNumber
-		};
-
-		var g_data = _data.Data.item.GuarantorsBio;
-		var GuarantorsBio = {
-			Name: g_data.FirstName + " " + g_data.LastName,
-			Gender: g_data.Gender,
-			Occupation: g_data.Occupation,
-			"Office Address": g_data.OfficeAddress,
-			"Residential Address": g_data.ResidentialAddress,
-			"Phone Numbers": g_data.PhoneNumbers,
-			"L.G.A. of Origin": g_data.LocalGovernmentOfOrigin,
-			"State of Origin": g_data.StateOfOrigin,
-			Nationality: g_data.Nationality,
-			Religion: g_data.Religion
-		};
-
-		console.log(Object.entries(VehicleOwnersBio).forEach(function (_ref) {
-			var _ref2 = _slicedToArray(_ref, 2),
-			    k = _ref2[0],
-			    v = _ref2[1];
-
-			return v;
-		}));
-		return (0, _mithril2.default)(
-			"section",
-			{ "class": "tc ph6 pb5 ", style: "min-height:90vh" },
-			(0, _mithril2.default)(
-				"div",
-				{ "class": "bg-gray cf pa3" },
-				(0, _mithril2.default)(
-					"button",
-					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
-					"Print"
-				)
-			),
-			(0, _mithril2.default)(
-				"section",
-				{ "class": "pv3 cf" },
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "dib  ba pa3 fl", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Vehicle Owner Bio Data"
-					),
-					(0, _mithril2.default)(
-						"div",
-						null,
-						(0, _mithril2.default)(
-							"div",
-							null,
-							(0, _mithril2.default)(
-								"div",
-								{ "class": "cf tc" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 dib " },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.VehicleOwnersBio.OwnersPassport ? _data.Data.item.VehicleOwnersBio.OwnersPassport : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Owner's Passport"
-									)
-								)
-							)
-						),
-						Object.entries(VehicleOwnersBio).map(function (_ref3) {
-							var _ref4 = _slicedToArray(_ref3, 2),
-							    key = _ref4[0],
-							    value = _ref4[1];
-
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-30 tl fl pr1" },
-									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
-									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
-									)
-								)
-							);
-						})
-					)
-				),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "dib  ba pa3 fr", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Drivers Bio Data"
-					),
-					(0, _mithril2.default)(
-						"div",
-						null,
-						(0, _mithril2.default)(
-							"div",
-							null,
-							(0, _mithril2.default)(
-								"div",
-								{ "class": "cf" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 fl" },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.DriversBio.DriversPhotograph ? _data.Data.item.DriversBio.DriversPhotograph : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Drivers Photograph"
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 fl " },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.DriversBio.DriversThumbprint ? _data.Data.item.DriversBio.DriversThumbprint : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Drivers Thumbprint"
-									)
-								)
-							)
-						),
-						Object.entries(DriversBio).map(function (_ref5) {
-							var _ref6 = _slicedToArray(_ref5, 2),
-							    key = _ref6[0],
-							    value = _ref6[1];
-
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-30 tl fl pr1" },
-									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
-									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
-									)
-								)
-							);
-						})
-					)
-				)
-			),
-			(0, _mithril2.default)(
-				"section",
-				{ "class": "pv3 cf" },
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "dib  ba pa3 fl", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Vehicle Particulars"
-					),
-					(0, _mithril2.default)(
-						"div",
-						null,
-						(0, _mithril2.default)(
-							"div",
-							null,
-							(0, _mithril2.default)(
-								"div",
-								{ "class": "cf tc" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 dib " },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.VehicleDetails.PhotographOfVehicle ? _data.Data.item.VehicleDetails.PhotographOfVehicle : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Photograph of Vehicle"
-									)
-								)
-							)
-						),
-						Object.entries(VehicleParticulars).map(function (_ref7) {
-							var _ref8 = _slicedToArray(_ref7, 2),
-							    key = _ref8[0],
-							    value = _ref8[1];
-
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-30 tl fl pr1" },
-									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
-									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
-									)
-								)
-							);
-						})
-					)
-				),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "dib  ba pa3 fr", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Guarantors Bio Data"
-					),
-					(0, _mithril2.default)(
-						"div",
-						null,
-						(0, _mithril2.default)(
-							"div",
-							null,
-							(0, _mithril2.default)(
-								"div",
-								{ "class": "cf" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 fl" },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.GuarantorsBio.GuarantorsPassport ? _data.Data.item.GuarantorsBio.GuarantorsPassport : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Guarantors Passport"
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 fl " },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.GuarantorsBio.GuarantorsIdentity ? _data.Data.item.GuarantorsBio.GuarantorsIdentity : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Guarantors Identity"
-									)
-								)
-							)
-						),
-						Object.entries(GuarantorsBio).map(function (_ref9) {
-							var _ref10 = _slicedToArray(_ref9, 2),
-							    key = _ref10[0],
-							    value = _ref10[1];
-
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-30 tl fl pr1" },
-									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
-									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
-									)
-								)
-							);
-						})
-					)
-				)
-			),
-			(0, _mithril2.default)(
-				"div",
-				{ "class": "bg-gray cf pa3" },
-				(0, _mithril2.default)(
-					"button",
-					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
-					"Print"
-				)
-			)
-		);
-	}
-};
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.Shell = undefined;
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-var _flatpickr = __webpack_require__(5);
-
-var _flatpickr2 = _interopRequireDefault(_flatpickr);
-
-var _svgIcons = __webpack_require__(22);
-
-var _data = __webpack_require__(1);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Shell = exports.Shell = {
-	oncreate: function oncreate() {
-		(0, _flatpickr2.default)(document.getElementById("fromDate"), {});
-		(0, _flatpickr2.default)(document.getElementById("toDate"), {});
-	},
-	view: function view(vnode) {
-		return (0, _mithril2.default)(
-			"section",
-			{ "class": "bg-near-white  f6 fw3 navy" },
-			(0, _mithril2.default)(
-				"div",
-				{ "class": "bg-dark-blue white-80 shadow-4 fixed w-100 z-3" },
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "ph5 pa3 cf" },
-					(0, _mithril2.default)(
-						"a",
-						{ "class": "link dib ph2 pv2 ", oncreate: _mithril2.default.route.link, href: "/" },
-						"home"
-					),
-					(0, _mithril2.default)(
-						"a",
-						{
-							"class": "link dib ph2 pv2 ",
-							oncreate: _mithril2.default.route.link,
-							href: "/analytics"
-						},
-						"analytics"
-					),
-					(0, _mithril2.default)(
-						"div",
-						{ "class": "dib pl4" },
-						(0, _mithril2.default)(
-							"span",
-							{ "class": " dib ph2 pv2 " },
-							"search:"
-						),
-						(0, _mithril2.default)(
-							"form",
-							{ "class": "dib pl3 w5 relative" },
-							(0, _mithril2.default)("input", {
-								type: "text",
-								"class": "bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib",
-								placeholder: "form number, name, slot number, etc",
-								style: "outline: none",
-								oninput: _mithril2.default.withAttr("value", function (value) {
-									_data.Data.searchquery = value;
-								})
-							}),
-							(0, _mithril2.default)(
-								"p",
-								{ "class": "mv0 dib w1 h1 absolute pointer", style: "top: 0.5rem; right:0.5rem",
-									onclick: function onclick() {
-										console.log("Search button clicked");
-										_data.Data.Search().then(function (resp) {
-											console.log(resp);
-										}).catch(function (err) {
-											console.log(err);
-										});
-									} },
-								(0, _mithril2.default)(_svgIcons.SVGIcons, { type: "search" })
-							)
-						)
-					),
-					(0, _mithril2.default)(
-						"div",
-						{ "class": "dib fr pv2" },
-						(0, _mithril2.default)(
-							"a",
-							{
-								"class": "bw0 bg-dark-red shadow-4 pv2 ph3  br2 white-90 pointer grow link",
-								style: "background-color:#5889FF",
-								oncreate: _mithril2.default.route.link,
-								href: "/registration"
-							},
-							"New Registration"
-						)
-					)
-				)
-			),
-			(0, _mithril2.default)(
-				"section",
-				{ "class": "pa4 tc " },
-				(0, _mithril2.default)("div", { "class": "pv4" }),
-				(0, _mithril2.default)(
-					"div",
-					{ "class": "dib bb b--gray pa2 pb3" },
-					(0, _mithril2.default)(
-						"div",
-						{ "class": "dib pr3" },
-						(0, _mithril2.default)(
-							"span",
-							{ "class": "dib pr2" },
-							"From: "
-						),
-						(0, _mithril2.default)("input", {
-							type: "text",
-							id: "fromDate",
-							"class": "pv2 ph3 br2 bw1 ba b--gray dib "
-						})
-					),
-					(0, _mithril2.default)(
-						"div",
-						{ "class": "dib " },
-						(0, _mithril2.default)(
-							"span",
-							{ "class": "dib pr2" },
-							"To: "
-						),
-						(0, _mithril2.default)("input", {
-							type: "text",
-							id: "toDate",
-							"class": "pv2 ph3 br2 bw1 ba b--gray dib "
-						})
-					),
-					(0, _mithril2.default)(
-						"div",
-						{ "class": "dib ml3" },
-						(0, _mithril2.default)(
-							"button",
-							{ "class": "bw0  shadow-4 pv2 ph3  br2 pointer grow ma2" },
-							"Search"
-						),
-						(0, _mithril2.default)(
-							"button",
-							{ "class": "bw0 shadow-4 pv2 ph3  br2  pointer grow ma2" },
-							"Clear"
-						)
-					)
-				)
-			),
-			vnode.children
-		);
-	}
-};
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Analytics = {
-    view: function view(vnode) {
-        return (0, _mithril2.default)(
-            "section",
-            { "class": "" },
-            (0, _mithril2.default)(
-                "table",
-                { "class": "f6 w-100  center ba b--black-20 bg-white", cellspacing: "0" },
-                (0, _mithril2.default)(
-                    "thead",
-                    { "class": "tc" },
-                    (0, _mithril2.default)(
-                        "tr",
-                        { "class": "bg-near-white" },
-                        (0, _mithril2.default)(
-                            "th",
-                            { "class": "fw6 bb b--black-20  pa3 " },
-                            "S/N"
-                        ),
-                        (0, _mithril2.default)(
-                            "th",
-                            { "class": "fw6 bb b--black-20  pa3 " },
-                            "Name"
-                        ),
-                        (0, _mithril2.default)(
-                            "th",
-                            { "class": "fw6 bb b--black-20  pa3 " },
-                            "Reg. No."
-                        ),
-                        (0, _mithril2.default)(
-                            "th",
-                            { "class": "fw6 bb b--black-20  pa3 " },
-                            "Vehicle No."
-                        ),
-                        (0, _mithril2.default)(
-                            "th",
-                            { "class": "fw6 bb b--black-20  pa3 " },
-                            "Form No."
-                        ),
-                        (0, _mithril2.default)(
-                            "th",
-                            { "class": "fw6 bb b--black-20  pa3 " },
-                            "Actions"
-                        )
-                    )
-                ),
-                (0, _mithril2.default)(
-                    "tbody",
-                    { "class": "lh-copy" },
-                    (0, _mithril2.default)(
-                        "tr",
-                        null,
-                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
-                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
-                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
-                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
-                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
-                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" })
-                    )
-                )
-            )
-        );
-    }
-};
-
-exports.default = Analytics;
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.Icon = exports.SVGIcons = undefined;
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _mithril = __webpack_require__(0);
-
-var _mithril2 = _interopRequireDefault(_mithril);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var SVGIcons = exports.SVGIcons = {
-	view: function view(vnode) {
-		switch (vnode.attrs.type) {
-			case "logo-black":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ "class": "w-100", viewBox: "0 0 36 26" }, vnode.attrs),
-					(0, _mithril2.default)(
-						"g",
-						{
-							id: "Welcome",
-							stroke: "none",
-							"stroke-width": "1",
-							fill: "none",
-							"fill-rule": "evenodd"
-						},
-						(0, _mithril2.default)(
-							"g",
-							{
-								id: "Mobile-Portrait-Copy",
-								transform: "translate(-16.000000, -12.000000)"
-							},
-							(0, _mithril2.default)(
-								"g",
-								{ id: "logo", transform: "translate(10.000000, 9.000000)" },
-								(0, _mithril2.default)(
-									"g",
-									{ id: "Group-3", transform: "translate(6.000000, 3.000000)" },
-									(0, _mithril2.default)(
-										"g",
-										{
-											id: "Group-2",
-											transform: "translate(7.973666, 0.000000)",
-											fill: "#2E3938"
-										},
-										(0, _mithril2.default)(
-											"g",
-											{ id: "Group-Copy", "fill-rule": "nonzero" },
-											(0, _mithril2.default)("path", {
-												d: "M0.0436856122,24.7067099 C-0.0427713225,25.4129674 0.487478465,25.9848377 1.22451348,25.9833184 L26.6698414,25.9308675 C27.4084516,25.929345 27.9369572,25.4565539 27.8506693,24.8766868 L25.4856554,8.68075251 C25.3991985,8.07761682 24.7354388,7.50631105 23.9913314,7.40378973 L19.9729071,6.85014088 L19.9729071,5.72693317 C19.9729071,5.72693317 19.9729071,1.23410141 13.9471774,0.156058938 C7.92144775,-0.921983453 7.92144775,3.9673789 7.92144775,3.9673789 L7.92144775,5.18971974 C7.92144775,5.86479994 8.52532656,6.49029414 9.26620998,6.58627691 L15.955754,7.45291925 L15.955754,6.29666717 L9.26049879,5.37421097 L9.26049879,4.16288493 C9.26049879,4.16288493 9.26049879,0.528902807 13.9471774,1.32883321 C18.6338561,2.12876342 18.6338561,5.53142714 18.6338561,5.53142714 L18.6338561,6.66564964 C18.6338561,7.29206343 19.2275287,7.87678349 19.971636,7.97318391 L23.9900603,8.49377794 L26.4673129,24.8614991 L1.42704202,24.7071383 L3.90429462,5.89163123 L5.24334566,6.06510767 L5.24334566,4.82073726 L2.56524357,4.45175478 L0.0436856122,24.7067099 Z",
-												id: "Shape"
-											})
-										),
-										(0, _mithril2.default)("path", {
-											d: "M11.7246818,19.6279318 L9.33430967,19.5601143 L9.45245768,18.8187369 L7.63048009,18.7420307 L8.84101662,12.2597894 L12.4136013,12.9097416 L11.7246818,19.6279318 Z M10.9259389,13.1195253 L10.3827763,17.1530716 L9.88143642,17.1151826 L10.4731534,13.042845 L9.34874816,12.8511441 L8.40513073,18.2686432 L10.208328,18.3613224 L10.1117847,19.0915943 L11.4256977,19.1406799 L12.0654613,13.3112262 L10.9259389,13.1195253 Z M15.8628212,19.744877 L13.4605922,19.6770596 L13.5135401,18.9888025 L11.6781515,18.9120962 L12.3046543,12.8902314 L15.9908743,13.5401836 L15.8628212,19.744877 Z M14.3968514,13.6979063 L14.1917637,17.4388589 L13.6839848,17.4009699 L13.9310344,13.621226 L12.7740505,13.4295251 L12.3002486,18.4683735 L14.1191963,18.5610527 L14.0844072,19.2396905 L15.406662,19.288776 L15.5689524,13.8896072 L14.3968514,13.6979063 Z M19.6514083,14.1660832 L19.9913705,19.8609796 L15.7045676,19.7404153 L15.8523716,13.516131 L19.6514083,14.1660832 Z M15.9895113,13.9579638 L15.8788198,19.3062789 L19.065878,19.4240843 L18.8558503,14.4180458 L15.9895113,13.9579638 Z M17.6702826,15.2353428 L17.721007,18.3249808 L17.2008244,18.2939373 L17.182182,15.1700717 L17.6702826,15.2353428 Z",
-											id: "440-copy",
-											stroke: "#2E3938",
-											"stroke-width": "0.5"
-										})
-									),
-									(0, _mithril2.default)("rect", {
-										id: "Rectangle-2",
-										fill: "#2D3938",
-										transform: "translate(6.178707, 7.702437) rotate(8.000000) translate(-6.178707, -7.702437) ",
-										x: "3.40463511",
-										y: "6.94062199",
-										width: "5.54814319",
-										height: "1.52362949"
-									}),
-									(0, _mithril2.default)("rect", {
-										id: "Rectangle-2-Copy-2",
-										fill: "#2D3938",
-										transform: "translate(4.087669, 13.256233) rotate(8.000000) translate(-4.087669, -13.256233) ",
-										x: "0.0987211391",
-										y: "12.4944185",
-										width: "7.97789668",
-										height: "1.52362949"
-									}),
-									(0, _mithril2.default)("rect", {
-										id: "Rectangle-2-Copy",
-										fill: "#2D3938",
-										transform: "translate(4.743779, 18.878940) rotate(7.000000) translate(-4.743779, -18.878940) ",
-										x: "1.96970713",
-										y: "18.1171252",
-										width: "5.54814319",
-										height: "1.52362949"
-									})
-								)
-							)
-						)
-					)
-				);
-			case "logo-white":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						xmlns: "http://www.w3.org/2000/svg"
-					}, vnode.attrs, {
-						viewBox: "0 0 36 26"
-					}),
-					(0, _mithril2.default)("style", null),
-					(0, _mithril2.default)(
-						"g",
-						{ fill: "none" },
-						(0, _mithril2.default)(
-							"g",
-							{ fill: "#fff" },
-							(0, _mithril2.default)("path", { d: "M8 24.7C7.9 25.4 8.5 26 9.2 26L34.6 25.9C35.4 25.9 35.9 25.5 35.8 24.9L33.5 8.7C33.4 8.1 32.7 7.5 32 7.4L27.9 6.9 27.9 5.7C27.9 5.7 27.9 1.2 21.9 0.2 15.9-0.9 15.9 4 15.9 4L15.9 5.2C15.9 5.9 16.5 6.5 17.2 6.6L23.9 7.5 23.9 6.3 17.2 5.4 17.2 4.2C17.2 4.2 17.2 0.5 21.9 1.3 26.6 2.1 26.6 5.5 26.6 5.5L26.6 6.7C26.6 7.3 27.2 7.9 27.9 8L32 8.5 34.4 24.9 9.4 24.7 11.9 5.9 13.2 6.1 13.2 4.8 10.5 4.5 8 24.7Z" }),
-							(0, _mithril2.default)("path", {
-								d: "M19.7 19.6L17.3 19.6 17.4 18.8 15.6 18.7 16.8 12.3 20.4 12.9 19.7 19.6ZM18.9 13.1L18.4 17.2 17.9 17.1 18.4 13 17.3 12.9 16.4 18.3 18.2 18.4 18.1 19.1 19.4 19.1 20 13.3 18.9 13.1ZM23.8 19.7L21.4 19.7 21.5 19 19.7 18.9 20.3 12.9 24 13.5 23.8 19.7ZM22.4 13.7L22.2 17.4 21.7 17.4 21.9 13.6 20.7 13.4 20.3 18.5 22.1 18.6 22.1 19.2 23.4 19.3 23.5 13.9 22.4 13.7ZM27.6 14.2L28 19.9 23.7 19.7 23.8 13.5 27.6 14.2ZM24 14L23.9 19.3 27 19.4 26.8 14.4 24 14ZM25.6 15.2L25.7 18.3 25.2 18.3 25.2 15.2 25.6 15.2Z",
-								style: "stroke-width:0.5;stroke:#fff"
-							})
-						),
-						(0, _mithril2.default)("rect", {
-							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(6.178707 7.702437)rotate(8)",
-							x: "-2.8",
-							y: "-0.8",
-							width: "5.5",
-							height: "1.5",
-							"class": "a"
-						}),
-						(0, _mithril2.default)("rect", {
-							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(4.087669 13.256233)rotate(8)",
-							x: "-4",
-							y: "-0.8",
-							width: "8",
-							height: "1.5",
-							"class": "a"
-						}),
-						(0, _mithril2.default)("rect", {
-							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(4.743779 18.87894)rotate(7)",
-							x: "-2.8",
-							y: "-0.8",
-							width: "5.5",
-							height: "1.5",
-							"class": "a",
-							fill: "#fff"
-						})
-					)
-				);
-			case "facebook":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						viewBox: "0 0 32 32",
-						role: "presentation",
-						"aria-hidden": "true",
-						focusable: "false"
-					}, vnode.attrs),
-					(0, _mithril2.default)("path", {
-						"fill-rule": "evenodd",
-						d: "M8 14.408v-4.165c0-.424.35-.812.77-.812h2.519V7.347c0-4.84 2.484-7.311 7.42-7.347 1.645 0 3.219.212 4.692.636.455.141.63.424.595.883l-.56 4.062c-.035.178-.14.354-.315.531-.21.105-.42.176-.63.14-.875-.247-1.784-.352-2.799-.352-1.399 0-1.61.283-1.61 1.73v1.8H22.6c.42 0 .805.423.805.883l-.349 4.17c0 .422-.35.705-.77.705H18.08v16c0 .424-.349.812-.769.812h-5.213c-.42 0-.804-.388-.804-.812V15.185h-2.52A.781.781 0 0 1 8 14.408"
-					})
-				);
-			case "google":
-				return (0, _mithril2.default)(
-					"svg",
-					{ width: "30px", height: "30px", viewBox: "10 10 25 25", version: "1.1", xmlns: "http://www.w3.org/2000/svg" },
-					(0, _mithril2.default)(
-						"title",
-						null,
-						"btn_google_light_normal_ios"
-					),
-					(0, _mithril2.default)(
-						"desc",
-						null,
-						"Created with Sketch."
-					),
-					(0, _mithril2.default)(
-						"defs",
-						null,
-						(0, _mithril2.default)(
-							"filter",
-							{ x: "-50%", y: "-50%", width: "200%", height: "200%", filterUnits: "objectBoundingBox", id: "filter-1" },
-							(0, _mithril2.default)("feOffset", { dx: "0", dy: "1", "in": "SourceAlpha", result: "shadowOffsetOuter1" }),
-							(0, _mithril2.default)("feGaussianBlur", { stdDeviation: "0.5", "in": "shadowOffsetOuter1", result: "shadowBlurOuter1" }),
-							(0, _mithril2.default)("feColorMatrix", { values: "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.168 0", "in": "shadowBlurOuter1", type: "matrix", result: "shadowMatrixOuter1" }),
-							(0, _mithril2.default)("feOffset", { dx: "0", dy: "0", "in": "SourceAlpha", result: "shadowOffsetOuter2" }),
-							(0, _mithril2.default)("feGaussianBlur", { stdDeviation: "0.5", "in": "shadowOffsetOuter2", result: "shadowBlurOuter2" }),
-							(0, _mithril2.default)("feColorMatrix", { values: "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.084 0", "in": "shadowBlurOuter2", type: "matrix", result: "shadowMatrixOuter2" }),
-							(0, _mithril2.default)(
-								"feMerge",
-								null,
-								(0, _mithril2.default)("feMergeNode", { "in": "shadowMatrixOuter1" }),
-								(0, _mithril2.default)("feMergeNode", { "in": "shadowMatrixOuter2" }),
-								(0, _mithril2.default)("feMergeNode", { "in": "SourceGraphic" })
-							)
-						),
-						(0, _mithril2.default)("rect", { id: "path-2", x: "0", y: "0", width: "40", height: "40", rx: "2" })
-					),
-					(0, _mithril2.default)(
-						"g",
-						{ id: "Google-Button", stroke: "none", "stroke-width": "1", fill: "none", "fill-rule": "evenodd" },
-						(0, _mithril2.default)("g", { id: "9-PATCH", transform: "translate(-608.000000, -160.000000)" }),
-						(0, _mithril2.default)(
-							"g",
-							{ id: "btn_google_light_normal", transform: "translate(-1.000000, -1.000000)" },
-							(0, _mithril2.default)(
-								"g",
-								{ id: "button", transform: "translate(4.000000, 4.000000)", filter: "url(#filter-1)" },
-								(0, _mithril2.default)(
-									"g",
-									{ id: "button-bg" },
-									(0, _mithril2.default)("use", { fill: "#FFFFFF", "fill-rule": "evenodd" }),
-									(0, _mithril2.default)("use", { fill: "none" }),
-									(0, _mithril2.default)("use", { fill: "none" }),
-									(0, _mithril2.default)("use", { fill: "none" })
-								)
-							),
-							(0, _mithril2.default)(
-								"g",
-								{ id: "logo_googleg_48dp", transform: "translate(15.000000, 15.000000)" },
-								(0, _mithril2.default)("path", { d: "M17.64,9.20454545 C17.64,8.56636364 17.5827273,7.95272727 17.4763636,7.36363636 L9,7.36363636 L9,10.845 L13.8436364,10.845 C13.635,11.97 13.0009091,12.9231818 12.0477273,13.5613636 L12.0477273,15.8195455 L14.9563636,15.8195455 C16.6581818,14.2527273 17.64,11.9454545 17.64,9.20454545 L17.64,9.20454545 Z", id: "Shape", fill: "#4285F4" }),
-								(0, _mithril2.default)("path", { d: "M9,18 C11.43,18 13.4672727,17.1940909 14.9563636,15.8195455 L12.0477273,13.5613636 C11.2418182,14.1013636 10.2109091,14.4204545 9,14.4204545 C6.65590909,14.4204545 4.67181818,12.8372727 3.96409091,10.71 L0.957272727,10.71 L0.957272727,13.0418182 C2.43818182,15.9831818 5.48181818,18 9,18 L9,18 Z", id: "Shape", fill: "#34A853" }),
-								(0, _mithril2.default)("path", { d: "M3.96409091,10.71 C3.78409091,10.17 3.68181818,9.59318182 3.68181818,9 C3.68181818,8.40681818 3.78409091,7.83 3.96409091,7.29 L3.96409091,4.95818182 L0.957272727,4.95818182 C0.347727273,6.17318182 0,7.54772727 0,9 C0,10.4522727 0.347727273,11.8268182 0.957272727,13.0418182 L3.96409091,10.71 L3.96409091,10.71 Z", id: "Shape", fill: "#FBBC05" }),
-								(0, _mithril2.default)("path", { d: "M9,3.57954545 C10.3213636,3.57954545 11.5077273,4.03363636 12.4404545,4.92545455 L15.0218182,2.34409091 C13.4631818,0.891818182 11.4259091,0 9,0 C5.48181818,0 2.43818182,2.01681818 0.957272727,4.95818182 L3.96409091,7.29 C4.67181818,5.16272727 6.65590909,3.57954545 9,3.57954545 L9,3.57954545 Z", id: "Shape", fill: "#EA4335" }),
-								(0, _mithril2.default)("path", { d: "M0,0 L18,0 L18,18 L0,18 L0,0 Z", id: "Shape" })
-							),
-							(0, _mithril2.default)("g", { id: "handles_square" })
-						)
-					)
-				);
-			case "email":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						viewBox: "0 0 24 24",
-						role: "presentation",
-						"aria-hidden": "true",
-						focusable: "false",
-						style: "fill: currentcolor;"
-					}, vnode.attrs),
-					(0, _mithril2.default)("path", {
-						"fill-rule": "evenodd",
-						d: "M22.497 4H1.503C.665 4 0 4.673 0 5.507v12.985C0 19.326.672 20 1.503 20h20.994A1.5 1.5 0 0 0 24 18.492V5.507C24 4.674 23.328 4 22.497 4zM23 18.203l-6.141-7.907L23 5.628v12.575zM22.174 5l-9.685 7.362c-.259.196-.719.196-.977 0L1.827 5h20.347zM1 5.628l6.14 4.667L1 18.185V5.629zM1.634 19l6.302-8.1 2.97 2.258c.616.468 1.572.468 2.188 0l2.969-2.257L22.353 19H1.633z"
-					})
-				);
-			case "location":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						width: "17",
-						height: "25",
-						version: "1.1",
-						id: "Capa_1",
-						xmlns: "http://www.w3.org/2000/svg",
-						viewBox: "0 0 54.757 54.757",
-						style: "enable-background:new 0 0 54.757 54.757;"
-
-					}, vnode.attrs),
-					(0, _mithril2.default)("path", { d: "M27.557,12c-3.859,0-7,3.141-7,7s3.141,7,7,7s7-3.141,7-7S31.416,12,27.557,12z M27.557,24c-2.757,0-5-2.243-5-5\r s2.243-5,5-5s5,2.243,5,5S30.314,24,27.557,24z" }),
-					(0, _mithril2.default)("path", { d: "M40.94,5.617C37.318,1.995,32.502,0,27.38,0c-5.123,0-9.938,1.995-13.56,5.617c-6.703,6.702-7.536,19.312-1.804,26.952\r L27.38,54.757L42.721,32.6C48.476,24.929,47.643,12.319,40.94,5.617z M41.099,31.431L27.38,51.243L13.639,31.4\r C8.44,24.468,9.185,13.08,15.235,7.031C18.479,3.787,22.792,2,27.38,2s8.901,1.787,12.146,5.031\r C45.576,13.08,46.321,24.468,41.099,31.431z" })
-				);
-			case "search":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						version: "1.1",
-						id: "Capa_1",
-						xmlns: "http://www.w3.org/2000/svg",
-						x: "0px",
-						y: "0px",
-						viewBox: "0 0 56.966 56.966",
-						style: "enable-background:new 0 0 56.966 56.966; "
-					}, vnode.attrs),
-					(0, _mithril2.default)("path", {
-						d: "M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23\r s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92\r c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17\r s-17-7.626-17-17S14.61,6,23.984,6z",
-						fill: "gray"
-					})
-				);
-			case "down":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						version: "1.1",
-						id: "Capa_1",
-						xmlns: "http://www.w3.org/2000/svg",
-						x: "0px",
-						y: "0px",
-						viewBox: "0 0 256 256",
-						style: "enable-background:new 0 0 256 256;"
-					}, vnode.attrs),
-					(0, _mithril2.default)(
-						"g",
-						null,
-						(0, _mithril2.default)(
-							"g",
-							null,
-							(0, _mithril2.default)("polygon", { points: "225.813,48.907 128,146.72 30.187,48.907 0,79.093 128,207.093 256,79.093" })
-						)
-					)
-				);
-
-			case "up":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({
-						version: "1.1",
-						id: "Capa_1",
-						xmlns: "http://www.w3.org/2000/svg",
-						x: "0px",
-						y: "0px",
-						viewBox: "0 0 256 256",
-						style: "enable-background:new 0 0 256 256;"
-					}, vnode.attrs),
-					(0, _mithril2.default)(
-						"g",
-						null,
-						(0, _mithril2.default)(
-							"g",
-							null,
-							(0, _mithril2.default)("polygon", { points: "128,48.907 0,176.907 30.187,207.093 128,109.28 225.813,207.093 256,176.907 \t\t" })
-						)
-					)
-				);
-			case "bag":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({}, vnode.attrs, { viewBox: "0 0 19 18", version: "1.1" }),
-					(0, _mithril2.default)(
-						"g",
-						{
-							id: "Welcome",
-							stroke: "none",
-							"stroke-width": "1",
-							fill: "none",
-							"fill-rule": "evenodd"
-						},
-						(0, _mithril2.default)(
-							"g",
-							{
-								id: "Mobile-Portrait-Copy-2",
-								transform: "translate(-179.000000, -730.000000)",
-								"fill-rule": "nonzero",
-								fill: "#000000"
-							},
-							(0, _mithril2.default)(
-								"g",
-								{
-									id: "shopping-basket-button-copy",
-									transform: "translate(179.000000, 730.000000)"
-								},
-								(0, _mithril2.default)("path", {
-									d: "M14.1167266,6.59969262 L10.282554,0.391905738 C10.1082392,0.203790984 9.84685252,0.0156762295 9.58543165,0.0156762295 C9.32401079,0.0156762295 9.06258993,0.109733607 8.88830935,0.391905738 L5.05413669,6.59969262 L0.871402878,6.59969262 C0.348561151,6.59969262 0,6.97592213 0,7.54026639 L0,7.82243852 L2.17850719,16.5697746 C2.35278777,17.3222336 3.04991007,17.9806352 3.83417266,17.9806352 L15.1624101,17.9806352 C15.9466727,17.9806352 16.643795,17.416291 16.8180755,16.5697746 L18.9965827,7.82243852 L18.9965827,7.54026639 C18.9965827,6.97592213 18.6480216,6.59969262 18.1251799,6.59969262 L14.1167266,6.59969262 Z M6.97122302,6.59969262 L9.58543165,2.46116803 L12.1996403,6.59969262 L6.97122302,6.59969262 Z M9.58543165,14.1242828 C8.62688849,14.1242828 7.8426259,13.2777664 7.8426259,12.2431352 C7.8426259,11.2085041 8.62688849,10.3619877 9.58543165,10.3619877 C10.5439748,10.3619877 11.3282374,11.2085041 11.3282374,12.2431352 C11.3282374,13.2777664 10.5439748,14.1242828 9.58543165,14.1242828 Z",
-									id: "Shape"
-								})
-							)
-						)
-					)
-				);
-			case "wishlist":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({}, vnode.attrs, { viewBox: "0 0 25 15" }),
-					(0, _mithril2.default)(
-						"g",
-						{ id: "Welcome", stroke: "none", "stroke-width": "1", fill: "none", "fill-rule": "evenodd" },
-						(0, _mithril2.default)(
-							"g",
-							{ id: "Mobile-Portrait-Copy-2", transform: "translate(-23.000000, -732.000000)", "fill-rule": "nonzero", fill: "#030104" },
-							(0, _mithril2.default)(
-								"g",
-								{ id: "add-to-list-copy", transform: "translate(23.000000, 732.500000)" },
-								(0, _mithril2.default)("path", { d: "M10,7 C10,7.784 9.45,8.4 8.75,8.4 L1.25,8.4 C0.55,8.4 0,7.784 0,7 C0,6.216 0.55,5.6 1.25,5.6 L8.75,5.6 C9.45,5.6 10,6.216 10,7 Z M8.75,11.2 L1.25,11.2 C0.55,11.2 0,11.816 0,12.6 C0,13.384 0.55,14 1.25,14 L8.75,14 C9.45,14 10,13.384 10,12.6 C10,11.816 9.45,11.2 8.75,11.2 Z M24.25,5.6 L20,5.6 L20,0.84 C20,0.056 19.45,0 18.75,0 C18.05,0 17.5,0.056 17.5,0.84 L17.5,5.6 L13.375,5.6 C12.675,5.6 12.625,6.216 12.625,7 C12.625,7.784 12.675,8.4 13.375,8.4 L17.5,8.4 L17.5,13.16 C17.5,13.944 18.05,14 18.75,14 C19.45,14 20,13.944 20,13.16 L20,8.4 L24.25,8.4 C24.95,8.4 25,7.784 25,7 C25,6.216 24.95,5.6 24.25,5.6 Z M8.75,0 L1.25,0 C0.55,0 0,0.616 0,1.4 C0,2.184 0.55,2.8 1.25,2.8 L8.75,2.8 C9.45,2.8 10,2.184 10,1.4 C10,0.616 9.45,0 8.75,0 Z", id: "Shape" })
-							)
-						)
-					)
-				);
-			case "logout":
-				return (0, _mithril2.default)(
-					"svg",
-					{ version: "1.1", id: "Capa_1", xmlns: "http://www.w3.org/2000/svg", x: "0px", y: "0px",
-						viewBox: "0 0 490.667 490.667", style: "enable-background:new 0 0 490.667 490.667;" },
-					(0, _mithril2.default)(
-						"g",
-						null,
-						(0, _mithril2.default)(
-							"g",
-							null,
-							(0, _mithril2.default)("path", { d: "M330.667,192c5.888,0,10.667-4.779,10.667-10.667v-128C341.333,23.936,317.419,0,288,0H53.333C23.915,0,0,23.936,0,53.333\r v384c0,29.397,23.915,53.333,53.333,53.333H288c29.419,0,53.333-23.936,53.333-53.333v-128c0-5.888-4.779-10.667-10.667-10.667\r S320,303.445,320,309.333v128c0,17.643-14.357,32-32,32H53.333c-17.643,0-32-14.357-32-32v-384c0-17.643,14.357-32,32-32H288\r c17.643,0,32,14.357,32,32v128C320,187.221,324.779,192,330.667,192z" })
-						)
-					),
-					(0, _mithril2.default)(
-						"g",
-						null,
-						(0, _mithril2.default)(
-							"g",
-							null,
-							(0, _mithril2.default)("path", { d: "M480,234.667H138.667c-5.888,0-10.667,4.779-10.667,10.667S132.779,256,138.667,256H480\r c5.888,0,10.667-4.779,10.667-10.667S485.888,234.667,480,234.667z" })
-						)
-					),
-					(0, _mithril2.default)(
-						"g",
-						null,
-						(0, _mithril2.default)(
-							"g",
-							null,
-							(0, _mithril2.default)("path", { d: "M487.531,237.824l-64-64c-4.16-4.16-10.923-4.16-15.083,0c-4.16,4.16-4.16,10.923,0,15.083l56.448,56.448l-56.448,56.448\r c-4.16,4.16-4.16,10.923,0,15.083c2.091,2.069,4.821,3.115,7.552,3.115c2.731,0,5.461-1.045,7.531-3.093l64-64\r C491.691,248.747,491.691,241.984,487.531,237.824z" })
-						)
-					)
-				);
-
-			case "loader":
-				return (0, _mithril2.default)(
-					"div",
-					{ "class": "dib w-100 tc" },
-					(0, _mithril2.default)(
-						"svg",
-						{ width: "38", height: "38", viewBox: "0 0 38 38", xmlns: "http://www.w3.org/2000/svg" },
-						(0, _mithril2.default)(
-							"defs",
-							null,
-							(0, _mithril2.default)(
-								"linearGradient",
-								{ x1: "8.042%", y1: "0%", x2: "65.682%", y2: "23.865%", id: "a" },
-								(0, _mithril2.default)("stop", { "stop-color": "#000", "stop-opacity": "0", offset: "0%" }),
-								(0, _mithril2.default)("stop", { "stop-color": "#000", "stop-opacity": ".631", offset: "63.146%" }),
-								(0, _mithril2.default)("stop", { "stop-color": "#000", offset: "100%" })
-							)
-						),
-						(0, _mithril2.default)(
-							"g",
-							{ fill: "none", "fill-rule": "evenodd" },
-							(0, _mithril2.default)(
-								"g",
-								{ transform: "translate(1 1)" },
-								(0, _mithril2.default)(
-									"path",
-									{ d: "M36 18c0-9.94-8.06-18-18-18", id: "Oval-2", stroke: "url(#a)", "stroke-width": "2" },
-									(0, _mithril2.default)("animateTransform", {
-										attributeName: "transform",
-										type: "rotate",
-										from: "0 18 18",
-										to: "360 18 18",
-										dur: "0.9s",
-										repeatCount: "indefinite" })
-								),
-								(0, _mithril2.default)(
-									"circle",
-									{ fill: "#fff", cx: "36", cy: "18", r: "1" },
-									(0, _mithril2.default)("animateTransform", {
-										attributeName: "transform",
-										type: "rotate",
-										from: "0 18 18",
-										to: "360 18 18",
-										dur: "0.9s",
-										repeatCount: "indefinite" })
-								)
-							)
-						)
-					)
-				);
-			case "phone":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ version: "1.1", id: "Capa_1", xmlns: "http://www.w3.org/2000/svg", x: "0px", y: "0px",
-						viewBox: "0 0 29.731 29.731", style: "enable-background:new 0 0 29.731 29.731;" }, vnode.attrs),
-					(0, _mithril2.default)(
-						"g",
-						null,
-						(0, _mithril2.default)("path", { d: "M23.895,29.731c-1.237,0-2.731-0.31-4.374-0.93c-3.602-1.358-7.521-4.042-11.035-7.556\r c-3.515-3.515-6.199-7.435-7.558-11.037C-0.307,6.933-0.31,4.245,0.921,3.015c0.177-0.177,0.357-0.367,0.543-0.563\r c1.123-1.181,2.392-2.51,4.074-2.45C6.697,0.05,7.82,0.77,8.97,2.201c3.398,4.226,1.866,5.732,0.093,7.478l-0.313,0.31\r c-0.29,0.29-0.838,1.633,4.26,6.731c1.664,1.664,3.083,2.882,4.217,3.619c0.714,0.464,1.991,1.166,2.515,0.642l0.315-0.318\r c1.744-1.769,3.25-3.296,7.473,0.099c1.431,1.15,2.15,2.272,2.198,3.433c0.069,1.681-1.27,2.953-2.452,4.075\r c-0.195,0.186-0.385,0.366-0.562,0.542C26.103,29.424,25.126,29.731,23.895,29.731z M5.418,1C4.223,1,3.144,2.136,2.189,3.141\r C1.997,3.343,1.811,3.539,1.628,3.722C0.711,4.638,0.804,7.045,1.864,9.856c1.31,3.472,3.913,7.266,7.33,10.683\r c3.416,3.415,7.208,6.018,10.681,7.327c2.811,1.062,5.218,1.152,6.133,0.237c0.183-0.183,0.379-0.369,0.581-0.56\r c1.027-0.976,2.192-2.082,2.141-3.309c-0.035-0.843-0.649-1.75-1.825-2.695c-3.519-2.83-4.503-1.831-6.135-0.176l-0.32,0.323\r c-0.78,0.781-2.047,0.608-3.767-0.51c-1.193-0.776-2.667-2.038-4.379-3.751c-4.231-4.23-5.584-6.819-4.26-8.146l0.319-0.315\r c1.659-1.632,2.66-2.617-0.171-6.138C7.245,1.651,6.339,1.037,5.496,1.001C5.47,1,5.444,1,5.418,1z" })
-					)
-				);
-			default:
-				return "not found";
-		}
-	}
-};
-
-var Icon = exports.Icon = {
-
-	view: function view(vnode) {
-		var name = vnode.attrs.name;
-
-		switch (name) {
-			case "list":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 511.6 511.6" }),
-					(0, _mithril2.default)("path", { d: "M118.8 201H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 214.3 0 220.8 0 228.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4S126.4 201 118.8 201z" }),
-					(0, _mithril2.default)("path", { d: "M118.8 54.8H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 68.1 0 74.6 0 82.2v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8s8-11.8 8-19.4V82.2c0-7.6-2.7-14.1-8-19.4C132.9 57.5 126.4 54.8 118.8 54.8z" }),
-					(0, _mithril2.default)("path", { d: "M118.8 347.2H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 360.5 0 367 0 374.6v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4S126.4 347.2 118.8 347.2z" }),
-					(0, _mithril2.default)("path", { d: "M484.2 201H210.1c-7.6 0-14.1 2.7-19.4 8s-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4C498.3 203.7 491.8 201 484.2 201z" }),
-					(0, _mithril2.default)("path", { d: "M484.2 347.2H210.1c-7.6 0-14.1 2.7-19.4 8 -5.3 5.3-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4C498.3 349.8 491.8 347.2 484.2 347.2z" }),
-					(0, _mithril2.default)("path", { d: "M503.6 62.8c-5.3-5.3-11.8-8-19.4-8H210.1c-7.6 0-14.1 2.7-19.4 8s-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8s8-11.8 8-19.4V82.2C511.6 74.6 509 68.1 503.6 62.8z" })
-				);
-			//break;
-			case "home":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 39.4 39.4" }),
-					(0, _mithril2.default)("path", { d: "M33.6 21v12.4c0 1.1-0.9 2-2 2H7.8c-1.1 0-2-0.9-2-2V21c0-0.7 0.4-1.3 0.9-1.7l11.9-7.4c0.6-0.4 1.5-0.4 2.1 0l11.9 7.4C33.3 19.6 33.6 20.3 33.6 21zM38.5 15.4L20.8 4.4c-0.6-0.4-1.5-0.4-2.1 0L0.9 15.4c-0.9 0.6-1.2 1.8-0.6 2.8 0.6 0.9 1.8 1.2 2.8 0.6L19.7 8.4l16.6 10.4c0.3 0.2 0.7 0.3 1.1 0.3 0.7 0 1.3-0.3 1.7-0.9C39.7 17.2 39.4 16 38.5 15.4z" })
-				);
-			case "user":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 258.8 258.8" }),
-					(0, _mithril2.default)("circle", { cx: "129.4", cy: "60", r: "60" }),
-					(0, _mithril2.default)("path", { d: "M129.4 150c-60.1 0-108.7 48.7-108.7 108.8h217.5C238.1 198.7 189.4 150 129.4 150z" })
-				);
-			case "search":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg"
-					}, vnode.attrs, {
-						viewBox: "0 0 250.3 250.3" }),
-					(0, _mithril2.default)("path", { d: "M244.2 214.6l-54.4-54.4c-0.3-0.3-0.6-0.5-0.9-0.8 10.7-16.2 16.9-35.7 16.9-56.6C205.8 46.1 159.7 0 102.9 0S0 46.1 0 102.9c0 56.8 46.1 102.9 102.9 102.9 20.9 0 40.3-6.2 56.6-16.9 0.3 0.3 0.5 0.6 0.8 0.9l54.4 54.4c8.2 8.2 21.4 8.2 29.6 0C252.4 236 252.4 222.8 244.2 214.6zM102.9 170.1c-37.1 0-67.2-30.1-67.2-67.2 0-37.1 30.1-67.2 67.2-67.2 37.1 0 67.2 30.1 67.2 67.2C170.1 140 140 170.1 102.9 170.1z" })
-				);
-			case "search-online":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 512 512" }),
-					(0, _mithril2.default)("path", { d: "M472.2 34.6H39.8C17.8 34.6 0 52.4 0 74.4v45.3c0 3.1 2.5 5.7 5.7 5.7h500.6c3.1 0 5.7-2.5 5.7-5.7V74.4C512 52.4 494.2 34.6 472.2 34.6zM71.8 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8c7.1 0 12.8 5.7 12.8 12.8C84.6 87.1 78.9 92.8 71.8 92.8zM113 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8 12.8 5.7 12.8 12.8C125.8 87.1 120 92.8 113 92.8zM154.1 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8c7.1 0 12.8 5.7 12.8 12.8C166.9 87.1 161.2 92.8 154.1 92.8z" }),
-					(0, _mithril2.default)("path", { d: "M353.3 286.9c-7.2 7.2-7.2 18.9 0 26.1 7.2 7.2 18.9 7.2 26.1 0 7.2-7.2 7.2-18.9 0-26.1C372.2 279.7 360.5 279.7 353.3 286.9z" }),
-					(0, _mithril2.default)("path", { d: "M506.3 148.2H5.7c-3.1 0-5.7 2.5-5.7 5.7v283.7c0 22 17.8 39.8 39.8 39.8h432.4c22 0 39.8-17.8 39.8-39.8V153.8C512 150.7 509.5 148.2 506.3 148.2zM300.2 366.8H90.2c-6.3 0-11.4-5.1-11.4-11.4 0-6.3 5.1-11.4 11.4-11.4h210c6.3 0 11.4 5.1 11.4 11.4C311.5 361.7 306.4 366.8 300.2 366.8zM429.9 363.5c-4.4 4.4-11.6 4.4-16.1 0l-27.5-27.5c-15.8 8.7-35.9 6.3-49.1-6.9 -16.1-16.1-16.1-42.2 0-58.3 16.1-16.1 42.2-16.1 58.3 0 13.3 13.3 15.6 33.4 6.9 49.1l27.5 27.5C434.3 351.8 434.3 359 429.9 363.5z" })
-				);
-			case "front-store-black":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg"
-					}, vnode.attrs, { viewBox: "0 0 459 459" }),
-					(0, _mithril2.default)("path", { d: "M433.5 25.5h-408v51h408V25.5zM459 280.5v-51L433.5 102h-408L0 229.5v51h25.5v153h255v-153h102v153h51v-153H459zM229.5 382.5h-153v-102h153V382.5z" })
-				);
-			case "shopper-at-store":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 488.2 488.2" }),
-					(0, _mithril2.default)("path", { d: "M340.8 121.2c0 3 2.4 5.4 5.4 5.4h15.9c3 0 5.4-2.4 5.4-5.4V93h-26.8V121.2z" }),
-					(0, _mithril2.default)("path", { d: "M277.1 228c1.9 0.8 3.9 1.1 5.9 1.1 6.6 0 12.9-4 15.4-10.6l12-31.4v5.3h19.3V136.5 94.4v-1.4h-4.9c0 0 0 0 0 0 -8.6 0-14.9 2.8-17.6 10.1L267.6 206.7c-0.9 2.3-1.1 4.6-1 6.9 4.3 3.7 7.7 8.4 9.7 13.9C276.6 227.6 276.8 227.9 277.1 228z" }),
-					(0, _mithril2.default)("path", { d: "M354.2 78.7c19 0 34.4-17.6 34.4-39.3C388.6 17.6 373.2 0 354.2 0c-19 0-34.4 17.6-34.4 39.3C319.8 61.1 335.2 78.7 354.2 78.7z" }),
-					(0, _mithril2.default)("path", { d: "M131.5 154c20 0 36.3-18.6 36.3-41.5 0-22.9-16.2-41.5-36.3-41.5 -20 0-36.2 18.6-36.2 41.5C95.3 135.4 111.5 154 131.5 154z" }),
-					(0, _mithril2.default)("path", { d: "M398.2 187.5l11.8 31c2.5 6.6 8.8 10.6 15.4 10.6 2 0 3.9-0.3 5.9-1.1 8.5-3.2 12.8-12.8 9.6-21.3l-39.5-103.5c-2.8-7.3-9.7-10.1-17.6-10.1h-4.9v99.3h19.3L398.2 187.5z" }),
-					(0, _mithril2.default)("path", { d: "M469.2 234.8h-71l-0.1-30.9h-13.2v25.6c0 2-0.8 3.8-2 5.3h-57.5c-1.2-1.5-2-3.3-2-5.3v-25.6h-13.1v30.9h-32.2c0 0.2 0.1 0.3 0.1 0.5 1.7 14-5.4 27.1-16.9 33.7h190.7v79.1H432.9v-15.1c0-6.3-5.1-11.4-11.4-11.4h-17.7v-14c0-6.3-5.1-11.4-11.4-11.4h-39.5c-6.3 0-11.4 5.1-11.4 11.4v14h-13.6c-6.3 0-11.4 5.1-11.4 11.4v15.1h-37.2v-15.1c0-6.3-5.1-11.4-11.4-11.4h-34.4c-6.3 0-11.4 5.1-11.4 11.4v15.1h-44.4l0.3-79.1v-33.2l12.4 18.2c3.3 4.8 8.7 7.6 14.4 7.6 0.7 0 1.4 0 2.1-0.1l39.8-4.8c9.5-1.1 16.3-9.8 15.2-19.4 -1.2-9.5-9.6-16.4-19.4-15.2l-29.3 3.5 -33.7-49.4c-4.1-6.1-10.7-7.1-18.2-7.1h-60.5c-8.8 0-16 3.1-18.8 11L42 289.7c-2.8 7.8 0.5 16 7.1 20.3v35.9H13.3c-3.9 0-7.5 2-9.6 5.2 -2.1 3.3-2.4 7.4-0.8 10.9l23.9 53c1.8 4.1 5.9 6.7 10.4 6.7h48.4v45.6c0 11.5 9.3 20.9 20.9 20.9 11.5 0 20.9-9.3 20.9-20.9V349.5h8.3v117.8c0 11.5 9.4 20.9 20.9 20.9 11.5 0 20.9-9.3 20.9-20.9v-5.1h288.3c11.3 0 20.6-9.2 20.6-20.6V251.9C486.3 242.4 478.7 234.8 469.2 234.8zM66.3 345.9v-35c3.8-1.9 6.9-5.1 8.5-9.4l10.6-29.2 0.4 73.6H66.3zM452.1 428.1h-48.3v-7.6c0-6.3-5.1-11.4-11.4-11.4h-24.8v-9.8c0-6.3-5.1-11.4-11.4-11.4h-57.3c-6.3 0-11.4 5.1-11.4 11.4v28.8h-36.9v-17.1c0-6.3-5.1-11.4-11.4-11.4h-37.5c-6.3 0-11.4 5.1-11.4 11.4v17.1h-12.7v-62.9h274.6V428.1z" })
-				);
-			case "close":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({ xmlns: "http://www.w3.org/2000/svg"
-					}, vnode.attrs, {
-						viewBox: "0 0 23.3 23.3" }),
-					(0, _mithril2.default)("path", { d: "M16 11.7L22.6 5.1c1-1 1-2.5 0-3.5l-0.9-0.9c-1-1-2.5-1-3.5 0L11.7 7.3 5.1 0.7c-1-1-2.5-1-3.5 0L0.7 1.6c-1 1-1 2.5 0 3.5l6.6 6.6 -6.6 6.6c-1 1-1 2.5 0 3.5l0.9 0.9c1 1 2.5 1 3.5 0l6.6-6.6 6.6 6.6c1 1 2.5 1 3.5 0l0.9-0.9c1-1 1-2.5 0-3.5L16 11.7z" })
-				);
-			case "location":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 54.8 54.8" }),
-					(0, _mithril2.default)("path", { d: "M27.6 12c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7S31.4 12 27.6 12zM27.6 24c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5S30.3 24 27.6 24z" }),
-					(0, _mithril2.default)("path", { d: "M40.9 5.6C37.3 2 32.5 0 27.4 0c-5.1 0-9.9 2-13.6 5.6 -6.7 6.7-7.5 19.3-1.8 27L27.4 54.8 42.7 32.6C48.5 24.9 47.6 12.3 40.9 5.6zM41.1 31.4L27.4 51.2 13.6 31.4C8.4 24.5 9.2 13.1 15.2 7 18.5 3.8 22.8 2 27.4 2s8.9 1.8 12.1 5C45.6 13.1 46.3 24.5 41.1 31.4z" })
-				);
-			case "add-to-list":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 100 100" }),
-					(0, _mithril2.default)("path", { d: "M40 50c0 2.8-2.2 5-5 5H5c-2.8 0-5-2.2-5-5s2.2-5 5-5h30C37.8 45 40 47.2 40 50zM35 65H5c-2.8 0-5 2.2-5 5s2.2 5 5 5h30c2.8 0 5-2.2 5-5S37.8 65 35 65zM97 45H80V28c0-2.8-2.2-3-5-3s-5 0.2-5 3v17H53.5c-2.8 0-3 2.2-3 5s0.2 5 3 5H70v17c0 2.8 2.2 3 5 3s5-0.2 5-3V55h17c2.8 0 3-2.2 3-5S99.8 45 97 45zM35 25H5c-2.8 0-5 2.2-5 5s2.2 5 5 5h30c2.8 0 5-2.2 5-5S37.8 25 35 25z" })
-				);
-			case "cart":
-				return (0, _mithril2.default)(
-					"svg",
-					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 100 90" }),
-					(0, _mithril2.default)("path", { d: "M43.5 72.8c-2.6 0-4.7 2.1-4.7 4.8 0 2.6 2.1 4.8 4.8 4.8s4.8-2.1 4.8-4.7C48.3 74.9 46.1 72.8 43.5 72.8zM72.3 72.8c-2.6 0-4.7 2.1-4.7 4.8 0 2.6 2.1 4.8 4.8 4.8s4.8-2.1 4.8-4.7C77.1 74.9 75 72.8 72.3 72.8zM29.5 29.5l-3.8-11.7H5.4l2 7h13.2l14.3 43.6H81.4l13.3-38.9H29.5z" })
-				);
-			default:
-				return "";
-		}
-	}
-};
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
 * iziToast | v1.2.0
 * http://izitoast.marcelodolce.com
@@ -7524,6 +4801,2734 @@ var Icon = exports.Icon = {
 	return $iziToast;
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _HomePage = __webpack_require__(11);
+
+var _NewDriverPage = __webpack_require__(12);
+
+var _ViewItem = __webpack_require__(19);
+
+var _Shell = __webpack_require__(20);
+
+var _data = __webpack_require__(1);
+
+var _analytics = __webpack_require__(22);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var root = document.getElementById("appContainer");
+
+_mithril2.default.route.prefix("#!");
+
+_mithril2.default.route(root, "/", {
+	"/": {
+		view: function view(vnode) {
+			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_HomePage.HomePage, vnode.attrs));
+		}
+	},
+	"/registration": {
+		view: function view(vnode) {
+			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_NewDriverPage.NewDriverPage, vnode.attrs));
+		}
+	},
+	"/item/:id": {
+		view: function view(vnode) {
+			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_ViewItem.ViewItem, vnode.attrs));
+		}
+	},
+	"/analytics": {
+		view: function view(vnode) {
+			return (0, _mithril2.default)(_Shell.Shell, (0, _mithril2.default)(_analytics.Analytics, vnode.attrs));
+		}
+	}
+});
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(9);
+// On some exotic environments, it's not clear which object `setimmeidate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
+                }
+            }
+        }
+    }
+
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
+        };
+    }
+
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
+        };
+    }
+
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(10)))
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.HomePage = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _flatpickr = __webpack_require__(5);
+
+var _flatpickr2 = _interopRequireDefault(_flatpickr);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var HomePage = exports.HomePage = {
+	oncreate: function oncreate() {
+		_data.Data.GetAll();
+		(0, _flatpickr2.default)(document.getElementById("fromDate"), {});
+		(0, _flatpickr2.default)(document.getElementById("toDate"), {});
+	},
+	view: function view() {
+		return (0, _mithril2.default)(
+			"section",
+			{ "class": "tc ph6 pb5 ", style: "min-height:90vh" },
+			(0, _mithril2.default)(
+				"div",
+				{ "class": "bg-gray cf pa3" },
+				(0, _mithril2.default)(
+					"button",
+					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
+					"Refresh List"
+				)
+			),
+			(0, _mithril2.default)(
+				"table",
+				{ "class": "f6 w-100  center ba b--black-20 bg-white", cellspacing: "0" },
+				(0, _mithril2.default)(
+					"thead",
+					{ "class": "tc" },
+					(0, _mithril2.default)(
+						"tr",
+						{ "class": "bg-near-white" },
+						(0, _mithril2.default)(
+							"th",
+							{ "class": "fw6 bb b--black-20  pa3 " },
+							"S/N"
+						),
+						(0, _mithril2.default)(
+							"th",
+							{ "class": "fw6 bb b--black-20  pa3 " },
+							"Name"
+						),
+						(0, _mithril2.default)(
+							"th",
+							{ "class": "fw6 bb b--black-20  pa3 " },
+							"Reg. No."
+						),
+						(0, _mithril2.default)(
+							"th",
+							{ "class": "fw6 bb b--black-20  pa3 " },
+							"Vehicle No."
+						),
+						(0, _mithril2.default)(
+							"th",
+							{ "class": "fw6 bb b--black-20  pa3 " },
+							"Form No."
+						),
+						(0, _mithril2.default)(
+							"th",
+							{ "class": "fw6 bb b--black-20  pa3 " },
+							"Actions"
+						)
+					)
+				),
+				(0, _mithril2.default)(
+					"tbody",
+					{ "class": "lh-copy" },
+					_data.Data.items.map(function (item) {
+						return (0, _mithril2.default)(
+							"tr",
+							null,
+							(0, _mithril2.default)(
+								"td",
+								{ "class": "pv3 pr3 bb b--black-20" },
+								item.ID
+							),
+							(0, _mithril2.default)(
+								"td",
+								{ "class": "pv3 pr3 bb b--black-20" },
+								item.DriversBio.FirstName + " " + item.DriversBio.LastName
+							),
+							(0, _mithril2.default)(
+								"td",
+								{ "class": "pv3 pr3 bb b--black-20" },
+								item.VehicleDetails.RegistrationNumber
+							),
+							(0, _mithril2.default)(
+								"td",
+								{ "class": "pv3 pr3 bb b--black-20" },
+								item.VehicleDetails.VehicleLicenseNumber
+							),
+							(0, _mithril2.default)(
+								"td",
+								{ "class": "pv3 pr3 bb b--black-20" },
+								item.MetaData.FormNumber
+							),
+							(0, _mithril2.default)(
+								"td",
+								{ "class": "pv3 pr3 bb b--black-20" },
+								(0, _mithril2.default)(
+									"a",
+									{
+										"class": "link bg-green white pv2 ph3 br2 pointer",
+										oncreate: _mithril2.default.route.link,
+										href: "/item/" + item.ID
+									},
+									"view"
+								)
+							)
+						);
+					})
+				)
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.NewDriverPage = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _FormWizard = __webpack_require__(13);
+
+var _data = __webpack_require__(1);
+
+var _izitoast = __webpack_require__(6);
+
+var _izitoast2 = _interopRequireDefault(_izitoast);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var NewDriverPage = exports.NewDriverPage = {
+	oncreate: function oncreate() {},
+	ValidateSubmit: function ValidateSubmit() {
+		var f = _data.Data.data;
+		console.log(f.VehicleDetails);
+		if (!f.MetaData.FormNumber || !f.MetaData.SlotNumber) {
+			_izitoast2.default.error({
+				title: "Error",
+				message: "Please fill out the Meta Data",
+				position: "topCenter"
+			});
+			return;
+		}
+		if (!f.VehicleOwnersBio.FirstName || !f.VehicleOwnersBio.LastName || !f.VehicleOwnersBio.OtherName || !f.VehicleOwnersBio.Gender || !f.VehicleOwnersBio.DateOfBirth || !f.VehicleOwnersBio.MaritalStatus || !f.VehicleOwnersBio.OfficeAddress || !f.VehicleOwnersBio.ResidentialAddress || !f.VehicleOwnersBio.PhoneNumbers || !f.VehicleOwnersBio.Occupation || !f.VehicleOwnersBio.Religion || !f.VehicleOwnersBio.LocalGovernmentOfOrigin || !f.VehicleOwnersBio.StateOfOrigin || !f.VehicleOwnersBio.Nationality || !f.VehicleOwnersBio.NameOfNextOfKin || !f.VehicleOwnersBio.RelationshipWithNextOfKin || !f.VehicleOwnersBio.PhoneNumberOfNextOfKin || !f.VehicleOwnersBio.OwnersPassport) {
+			_izitoast2.default.error({
+				title: "Error",
+				message: "Please fill Vehicle Owner's Data",
+				position: "topCenter"
+			});
+			return;
+		}
+		if (!f.DriversBio.FirstName || !f.DriversBio.LastName || !f.DriversBio.OtherName || !f.DriversBio.Gender || !f.DriversBio.DateOfBirth || !f.DriversBio.MaritalStatus || !f.DriversBio.OfficeAddress || !f.DriversBio.ResidentialAddress || !f.DriversBio.PhoneNumbers || !f.DriversBio.Occupation || !f.DriversBio.Religion || !f.DriversBio.LocalGovernmentOfOrigin || !f.DriversBio.StateOfOrigin || !f.DriversBio.Nationality || !f.DriversBio.NameOfNextOfKin || !f.DriversBio.RelationshipWithNextOfKin || !f.DriversBio.PhoneNumberOfNextOfKin || !f.DriversBio.DriversPhotograph
+		// !f.DriversBio.DriversThumbprint
+		) {
+				_izitoast2.default.error({
+					title: "Error",
+					message: "Please fill out the Driver's Bio Data",
+					position: "topCenter"
+				});
+				return;
+			}
+		if (!f.GuarantorsBio.FirstName || !f.GuarantorsBio.LastName || !f.GuarantorsBio.OtherName || !f.GuarantorsBio.Gender || !f.GuarantorsBio.DateOfBirth || !f.GuarantorsBio.MaritalStatus || !f.GuarantorsBio.OfficeAddress || !f.GuarantorsBio.ResidentialAddress || !f.GuarantorsBio.PhoneNumbers || !f.GuarantorsBio.Occupation || !f.GuarantorsBio.Religion || !f.GuarantorsBio.LocalGovernmentOfOrigin || !f.GuarantorsBio.StateOfOrigin || !f.GuarantorsBio.Nationality || !f.GuarantorsBio.GuarantorsPassport || !f.GuarantorsBio.GuarantorsIdentity) {
+			_izitoast2.default.error({
+				title: "Error",
+				message: "Please fill out the Guarantor's Bio Data",
+				position: "topCenter"
+			});
+			return;
+		}
+		if (!f.VehicleDetails.RegistrationNumber || !f.VehicleDetails.TypeOfVehicle || !f.VehicleDetails.VehicleLicenseNumber || !f.VehicleDetails.ChasisNumber || !f.VehicleDetails.EngineNumber || !f.VehicleDetails.InsuranceNumber || !f.VehicleDetails.PhotographOfVehicle) {
+			_izitoast2.default.error({
+				title: "Error",
+				message: "Please fill out the Guarantor's Bio Data",
+				position: "topCenter"
+			});
+			return;
+		}
+		// add loader here...
+		_data.Data.Submit();
+	},
+	view: function view() {
+		return (0, _mithril2.default)(
+			"section",
+			{ "class": "tc ph6 " },
+			(0, _mithril2.default)(
+				"div",
+				{ "class": "bg-gray cf pa3" },
+				(0, _mithril2.default)(
+					"button",
+					{
+						"class": "fr pv2 ph3 bg-white shadow-4 ",
+						onclick: NewDriverPage.ValidateSubmit
+					},
+					"Save"
+				)
+			),
+			(0, _mithril2.default)(
+				"section",
+				{ "class": "pv3" },
+				(0, _mithril2.default)(_FormWizard.FormWizard, null)
+			),
+			(0, _mithril2.default)(
+				"div",
+				{ "class": "bg-gray cf pa3" },
+				(0, _mithril2.default)(
+					"button",
+					{
+						"class": "fr pv2 ph3 bg-white shadow-4 ",
+						onclick: NewDriverPage.ValidateSubmit
+					},
+					"Save"
+				)
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.FormWizard = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _MetaData = __webpack_require__(14);
+
+var _VehicleOwnersBio = __webpack_require__(15);
+
+var _DriversBio = __webpack_require__(16);
+
+var _GuarantorsBio = __webpack_require__(17);
+
+var _VehicleDetails = __webpack_require__(18);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var FormWizard = exports.FormWizard = {
+	start: 0,
+	view: function view() {
+		return (0, _mithril2.default)(
+			"section",
+			null,
+			(0, _mithril2.default)(_MetaData.MetaData, null),
+			(0, _mithril2.default)(_VehicleDetails.VehicleDetails, null),
+			(0, _mithril2.default)(_VehicleOwnersBio.VehicleOwnersBio, null),
+			(0, _mithril2.default)(_DriversBio.DriversBio, null),
+			(0, _mithril2.default)(_GuarantorsBio.GuarantorsBio, null)
+		);
+	}
+};
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.MetaData = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _TextInput = __webpack_require__(2);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MetaData = exports.MetaData = {
+	view: function view() {
+		return (0, _mithril2.default)(
+			"div",
+			{ "class": "mv4 pv4" },
+			(0, _mithril2.default)(
+				"fieldset",
+				null,
+				(0, _mithril2.default)(
+					"legend",
+					{ "class": "ph2" },
+					"Registration Meta Data"
+				),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Form Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.MetaData.FormNumber = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Slot Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.MetaData.SlotNumber = v;
+					})
+				})
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.VehicleOwnersBio = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _TextInput = __webpack_require__(2);
+
+var _ImageInput = __webpack_require__(4);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var VehicleOwnersBio = exports.VehicleOwnersBio = {
+	view: function view() {
+		return (0, _mithril2.default)(
+			"div",
+			{ "class": "mv4 pv4" },
+			(0, _mithril2.default)(
+				"fieldset",
+				null,
+				(0, _mithril2.default)(
+					"legend",
+					{ "class": "ph2" },
+					"Vehicle Owner's Bio"
+				),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "tc dib w-100" },
+					(0, _mithril2.default)(_ImageInput.ImageInput, {
+						label: "Owners Passport",
+						"class": " dib w-50 ",
+						Value: _data.Data.data.VehicleOwnersBio.OwnersPassport,
+						Callback: function Callback(v) {
+							return _data.Data.data.VehicleOwnersBio.OwnersPassport = v;
+						}
+					})
+				),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "First Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.FirstName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Last Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.LastName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Other Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.OtherName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Gender",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.Gender = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Date of Birth",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.DateOfBirth = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Marital Status",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.MaritalStatus = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Office Address",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.OfficeAddress = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Residential Address",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.ResidentialAddress = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Phone Numbers",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.PhoneNumbers = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Occupation",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.Occupation = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Religion",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.Religion = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "L.G.A. of Origin",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.LocalGovernmentOfOrigin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "State of Origin",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.StateOfOrigin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Nationality",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.Nationality = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Name of NOK",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.NameOfNextOfKin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Relationship with NOK",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.RelationshipWithNextOfKin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Phone Number of NOK",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleOwnersBio.PhoneNumberOfNextOfKin = v;
+					})
+				})
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.DriversBio = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _TextInput = __webpack_require__(2);
+
+var _ImageInput = __webpack_require__(4);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var DriversBio = exports.DriversBio = {
+	view: function view() {
+		return (0, _mithril2.default)(
+			"div",
+			{ "class": "mv4 pv4" },
+			(0, _mithril2.default)(
+				"fieldset",
+				null,
+				(0, _mithril2.default)(
+					"legend",
+					{ "class": "ph2" },
+					"Driver's Bio"
+				),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "tc dib w-100" },
+					(0, _mithril2.default)(_ImageInput.ImageInput, {
+						label: "Drivers Photograph",
+						"class": " dib w-50 ",
+						Value: _data.Data.data.DriversBio.DriversPhotograph,
+						Callback: function Callback(v) {
+							return _data.Data.data.DriversBio.DriversPhotograph = v;
+						}
+					}),
+					(0, _mithril2.default)(_ImageInput.ImageInput, {
+						label: "Drivers Thumbprint",
+						"class": " dib w-50 ",
+						Value: _data.Data.data.DriversBio.DriversThumbprint,
+						Callback: function Callback(v) {
+							return _data.Data.data.DriversBio.DriversThumbprint = v;
+						}
+					})
+				),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "First Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.FirstName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Last Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.LastName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Other Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.OtherName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Gender",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.Gender = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Date of Birth",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.DateOfBirth = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Marital Status",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.MaritalStatus = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Office Address",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.OfficeAddress = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Residential Address",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.ResidentialAddress = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Phone Numbers",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.PhoneNumbers = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Occupation",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.Occupation = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Religion",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.Religion = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "L.G.A. of Origin",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.LocalGovernmentOfOrigin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "State of Origin",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.StateOfOrigin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Nationality",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.Nationality = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Name of NOK",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.NameOfNextOfKin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Relationship with NOK",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.RelationshipWithNextOfKin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Phone Number of NOK",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.DriversBio.PhoneNumberOfNextOfKin = v;
+					})
+				})
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.GuarantorsBio = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _TextInput = __webpack_require__(2);
+
+var _ImageInput = __webpack_require__(4);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var GuarantorsBio = exports.GuarantorsBio = {
+	view: function view() {
+		return (0, _mithril2.default)(
+			"div",
+			{ "class": "mv4 pv4" },
+			(0, _mithril2.default)(
+				"fieldset",
+				null,
+				(0, _mithril2.default)(
+					"legend",
+					{ "class": "ph2" },
+					"Guarantor's Bio"
+				),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "tc dib w-100" },
+					(0, _mithril2.default)(_ImageInput.ImageInput, {
+						label: "Guarantors Passport",
+						"class": " dib w-50 ",
+						Value: _data.Data.data.GuarantorsBio.GuarantorsPassport,
+						Callback: function Callback(v) {
+							return _data.Data.data.GuarantorsBio.GuarantorsPassport = v;
+						}
+					}),
+					(0, _mithril2.default)(_ImageInput.ImageInput, {
+						label: "Guarantors Identity",
+						"class": " dib w-50 ",
+						Value: _data.Data.data.GuarantorsBio.GuarantorsIdentity,
+						Callback: function Callback(v) {
+							return _data.Data.data.GuarantorsBio.GuarantorsIdentity = v;
+						}
+					})
+				),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "First Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.FirstName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Last Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.LastName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Other Name",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.OtherName = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Gender",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.Gender = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Date of Birth",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.DateOfBirth = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Marital Status",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.MaritalStatus = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Office Address",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.OfficeAddress = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Residential Address",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.ResidentialAddress = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Phone Numbers",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.PhoneNumbers = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Occupation",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.Occupation = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Religion",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.Religion = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "L.G.A. of Origin",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.LocalGovernmentOfOrigin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "State of Origin",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.StateOfOrigin = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Nationality",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.GuarantorsBio.Nationality = v;
+					})
+				})
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.VehicleDetails = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _TextInput = __webpack_require__(2);
+
+var _ImageInput = __webpack_require__(4);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var VehicleDetails = exports.VehicleDetails = {
+	view: function view() {
+		return (0, _mithril2.default)(
+			"div",
+			{ "class": "mv4 pv4" },
+			(0, _mithril2.default)(
+				"fieldset",
+				null,
+				(0, _mithril2.default)(
+					"legend",
+					{ "class": "ph2" },
+					"Vehicle Details"
+				),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "tc dib w-100" },
+					(0, _mithril2.default)(_ImageInput.ImageInput, {
+						label: "Vehicle's Photograph",
+						"class": " dib w-50 ",
+						Value: _data.Data.data.VehicleDetails.PhotographOfVehicle,
+						Callback: function Callback(v) {
+							return _data.Data.data.VehicleDetails.PhotographOfVehicle = v;
+						}
+					})
+				),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Registration Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleDetails.RegistrationNumber = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Type of Vehicle",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleDetails.TypeOfVehicle = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Vehicle License Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleDetails.VehicleLicenseNumber = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Chasis Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleDetails.ChasisNumber = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Engine Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleDetails.EngineNumber = v;
+					})
+				}),
+				(0, _mithril2.default)(_TextInput.TextInput, {
+					label: "Insurance Number",
+					"class": "dib w-50",
+					oninput: _mithril2.default.withAttr("value", function (v) {
+						return _data.Data.data.VehicleDetails.InsuranceNumber = v;
+					})
+				})
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.ViewItem = undefined;
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var ViewItem = exports.ViewItem = {
+	oncreate: function oncreate(vnode) {
+		console.log(vnode.attrs.id);
+		_data.Data.GetOne(vnode.attrs.id);
+	},
+	view: function view() {
+		var vo_data = _data.Data.item.VehicleOwnersBio;
+		var VehicleOwnersBio = {
+			Name: vo_data.FirstName + " " + vo_data.LastName,
+			Gender: vo_data.Gender,
+			"Date of Birth": vo_data.DateOfBirth,
+			"Marital Status": vo_data.MaritalStatus,
+			"Office Address": vo_data.OfficeAddress,
+			"Residential Address": vo_data.ResidentialAddress,
+			"Phone Numbers": vo_data.PhoneNumbers,
+			Occupation: vo_data.Occupation,
+			Religion: vo_data.Religion,
+			"L.G.A. of Origin": vo_data.LocalGovernmentOfOrigin,
+			"State of Origin": vo_data.StateOfOrigin,
+			Nationality: vo_data.Nationality,
+			"Name of NOK": vo_data.NOK,
+			"Relationship with NOK": vo_data.RelationshipWithNextOfKin,
+			"Phone Number of NOK": vo_data.PhoneNumberOfNextOfKin,
+			Passport: vo_data.OwnersPassport
+		};
+
+		var drivers_data = _data.Data.item.DriversBio;
+		var DriversBio = {
+			Name: drivers_data.FirstName + " " + drivers_data.LastName,
+			Gender: drivers_data.Gender,
+			"Date of Birth": drivers_data.DateOfBirth,
+			"Marital Status": drivers_data.MaritalStatus,
+			"Office Address": drivers_data.OfficeAddress,
+			"Residential Address": drivers_data.ResidentialAddress,
+			"Phone Numbers": drivers_data.PhoneNumbers,
+			Occupation: drivers_data.Occupation,
+			Religion: drivers_data.Religion,
+			"L.G.A. of Origin": drivers_data.LocalGovernmentOfOrigin,
+			"State of Origin": drivers_data.StateOfOrigin,
+			Nationality: drivers_data.Nationality,
+			"Name of NOK": drivers_data.NOK,
+			"Relationship with NOK": drivers_data.RelationshipWithNextOfKin,
+			"Phone Number of NOK": drivers_data.PhoneNumberOfNextOfKin,
+			Photograph: drivers_data.DriversPhotograph,
+			Thumbprint: drivers_data.DriversThumbprint
+		};
+
+		var v_data = _data.Data.item.VehicleDetails;
+		var VehicleParticulars = {
+			"Registration Number": v_data.RegistrationNumber,
+			"Type of Vehicle": v_data.TypeOfVehicle,
+			"Vehicle License Number": v_data.VehicleLicenseNumber,
+			"Chasis Number": v_data.ChasisNumber,
+			"Engine Number": v_data.EngineNumber,
+			"Insurance Number": v_data.InsuranceNumber,
+			Photograph: v_data.PhotographOfVehicle
+		};
+
+		var g_data = _data.Data.item.GuarantorsBio;
+		var GuarantorsBio = {
+			Name: g_data.FirstName + " " + g_data.LastName,
+			Gender: g_data.Gender,
+			Occupation: g_data.Occupation,
+			"Office Address": g_data.OfficeAddress,
+			"Residential Address": g_data.ResidentialAddress,
+			"Phone Numbers": g_data.PhoneNumbers,
+			"L.G.A. of Origin": g_data.LocalGovernmentOfOrigin,
+			"State of Origin": g_data.StateOfOrigin,
+			Nationality: g_data.Nationality,
+			Religion: g_data.Religion,
+			Passport: g_data.GuarantorsPassport,
+			Identity: g_data.GuarantorsIdentity
+		};
+
+		console.log(Object.entries(VehicleOwnersBio).forEach(function (_ref) {
+			var _ref2 = _slicedToArray(_ref, 2),
+			    k = _ref2[0],
+			    v = _ref2[1];
+
+			return v;
+		}));
+		return (0, _mithril2.default)(
+			"section",
+			{ "class": "tc ph6 pb5 ", style: "min-height:90vh" },
+			(0, _mithril2.default)(
+				"div",
+				{ "class": "bg-gray cf pa3" },
+				(0, _mithril2.default)(
+					"button",
+					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
+					"Print"
+				)
+			),
+			(0, _mithril2.default)(
+				"section",
+				{ "class": "pv3 cf" },
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "dib  ba pa3 fl", style: "width:49%" },
+					(0, _mithril2.default)(
+						"h3",
+						null,
+						"Vehicle Owner Bio Data"
+					),
+					(0, _mithril2.default)(
+						"div",
+						null,
+						(0, _mithril2.default)(
+							"div",
+							null,
+							(0, _mithril2.default)(
+								"div",
+								{ "class": "cf tc" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": " pa2 tc w-50 dib " },
+									(0, _mithril2.default)(
+										"label",
+										{ "class": "dib tc" },
+										(0, _mithril2.default)("img", {
+											src: _data.Data.item.VehicleOwnersBio.OwnersPassport ? "/assets/img/uploads/" + _data.Data.item.VehicleOwnersBio.OwnersPassport : "//placehold.it/200x200",
+											"class": "w-100 bg-light-gray db h4",
+											alt: "",
+											style: "min-height:20px"
+										})
+									),
+									(0, _mithril2.default)(
+										"strong",
+										{ "class": "db f5 ma0 pa2" },
+										"Owner's Passport"
+									)
+								)
+							)
+						),
+						Object.entries(VehicleOwnersBio).map(function (_ref3) {
+							var _ref4 = _slicedToArray(_ref3, 2),
+							    key = _ref4[0],
+							    value = _ref4[1];
+
+							return (0, _mithril2.default)(
+								"div",
+								{ "class": "cf pv2" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-30 tl fl pr1" },
+									(0, _mithril2.default)(
+										"strong",
+										null,
+										key
+									)
+								),
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-70 tl fl" },
+									(0, _mithril2.default)(
+										"span",
+										{ "class": "fw6 ttu lh-copy" },
+										value
+									)
+								)
+							);
+						})
+					)
+				),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "dib  ba pa3 fr", style: "width:49%" },
+					(0, _mithril2.default)(
+						"h3",
+						null,
+						"Drivers Bio Data"
+					),
+					(0, _mithril2.default)(
+						"div",
+						null,
+						(0, _mithril2.default)(
+							"div",
+							null,
+							(0, _mithril2.default)(
+								"div",
+								{ "class": "cf" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": " pa2 tc w-50 fl" },
+									(0, _mithril2.default)(
+										"label",
+										{ "class": "dib tc" },
+										(0, _mithril2.default)("img", {
+											src: _data.Data.item.DriversBio.DriversPhotograph ? "/assets/img/uploads/" + _data.Data.item.DriversBio.DriversPhotograph : "//placehold.it/200x200",
+											"class": "w-100 bg-light-gray db",
+											alt: "",
+											style: "min-height:20px"
+										})
+									),
+									(0, _mithril2.default)(
+										"strong",
+										{ "class": "db f5 ma0 pa2" },
+										"Drivers Photograph"
+									)
+								),
+								(0, _mithril2.default)(
+									"div",
+									{ "class": " pa2 tc w-50 fl " },
+									(0, _mithril2.default)(
+										"label",
+										{ "class": "dib tc" },
+										(0, _mithril2.default)("img", {
+											src: _data.Data.item.DriversBio.DriversThumbprint ? "/assets/img/uploads/" + _data.Data.item.DriversBio.DriversThumbprint : "//placehold.it/200x200",
+											"class": "w-100 bg-light-gray db h4",
+											alt: "",
+											style: "min-height:20px"
+										})
+									),
+									(0, _mithril2.default)(
+										"strong",
+										{ "class": "db f5 ma0 pa2" },
+										"Drivers Thumbprint"
+									)
+								)
+							)
+						),
+						Object.entries(DriversBio).map(function (_ref5) {
+							var _ref6 = _slicedToArray(_ref5, 2),
+							    key = _ref6[0],
+							    value = _ref6[1];
+
+							return (0, _mithril2.default)(
+								"div",
+								{ "class": "cf pv2" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-30 tl fl pr1" },
+									(0, _mithril2.default)(
+										"strong",
+										null,
+										key
+									)
+								),
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-70 tl fl" },
+									(0, _mithril2.default)(
+										"span",
+										{ "class": "fw6 ttu lh-copy" },
+										value
+									)
+								)
+							);
+						})
+					)
+				)
+			),
+			(0, _mithril2.default)(
+				"section",
+				{ "class": "pv3 cf" },
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "dib  ba pa3 fl", style: "width:49%" },
+					(0, _mithril2.default)(
+						"h3",
+						null,
+						"Vehicle Particulars"
+					),
+					(0, _mithril2.default)(
+						"div",
+						null,
+						(0, _mithril2.default)(
+							"div",
+							null,
+							(0, _mithril2.default)(
+								"div",
+								{ "class": "cf tc" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": " pa2 tc w-50 dib " },
+									(0, _mithril2.default)(
+										"label",
+										{ "class": "dib tc" },
+										(0, _mithril2.default)("img", {
+											src: _data.Data.item.VehicleDetails.PhotographOfVehicle ? "/assets/img/uploads/" + _data.Data.item.VehicleDetails.PhotographOfVehicle : "//placehold.it/200x200",
+											"class": "w-100 bg-light-gray db h4",
+											alt: "",
+											style: "min-height:20px"
+										})
+									),
+									(0, _mithril2.default)(
+										"strong",
+										{ "class": "db f5 ma0 pa2" },
+										"Photograph of Vehicle"
+									)
+								)
+							)
+						),
+						Object.entries(VehicleParticulars).map(function (_ref7) {
+							var _ref8 = _slicedToArray(_ref7, 2),
+							    key = _ref8[0],
+							    value = _ref8[1];
+
+							return (0, _mithril2.default)(
+								"div",
+								{ "class": "cf pv2" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-30 tl fl pr1" },
+									(0, _mithril2.default)(
+										"strong",
+										null,
+										key
+									)
+								),
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-70 tl fl" },
+									(0, _mithril2.default)(
+										"span",
+										{ "class": "fw6 ttu lh-copy" },
+										value
+									)
+								)
+							);
+						})
+					)
+				),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "dib  ba pa3 fr", style: "width:49%" },
+					(0, _mithril2.default)(
+						"h3",
+						null,
+						"Guarantors Bio Data"
+					),
+					(0, _mithril2.default)(
+						"div",
+						null,
+						(0, _mithril2.default)(
+							"div",
+							null,
+							(0, _mithril2.default)(
+								"div",
+								{ "class": "cf" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": " pa2 tc w-50 fl" },
+									(0, _mithril2.default)(
+										"label",
+										{ "class": "dib tc" },
+										(0, _mithril2.default)("img", {
+											src: _data.Data.item.GuarantorsBio.GuarantorsPassport ? "/assets/img/uploads/" + _data.Data.item.GuarantorsBio.GuarantorsPassport : "//placehold.it/200x200",
+											"class": "w-100 bg-light-gray db",
+											alt: "",
+											style: "min-height:20px"
+										})
+									),
+									(0, _mithril2.default)(
+										"strong",
+										{ "class": "db f5 ma0 pa2" },
+										"Guarantors Passport"
+									)
+								),
+								(0, _mithril2.default)(
+									"div",
+									{ "class": " pa2 tc w-50 fl " },
+									(0, _mithril2.default)(
+										"label",
+										{ "class": "dib tc" },
+										(0, _mithril2.default)("img", {
+											src: _data.Data.item.GuarantorsBio.GuarantorsIdentity ? "/assets/img/uploads/" + _data.Data.item.GuarantorsBio.GuarantorsIdentity : "//placehold.it/200x200",
+											"class": "w-100 bg-light-gray db h4",
+											alt: "",
+											style: "min-height:20px"
+										})
+									),
+									(0, _mithril2.default)(
+										"strong",
+										{ "class": "db f5 ma0 pa2" },
+										"Guarantors Identity"
+									)
+								)
+							)
+						),
+						Object.entries(GuarantorsBio).map(function (_ref9) {
+							var _ref10 = _slicedToArray(_ref9, 2),
+							    key = _ref10[0],
+							    value = _ref10[1];
+
+							return (0, _mithril2.default)(
+								"div",
+								{ "class": "cf pv2" },
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-30 tl fl pr1" },
+									(0, _mithril2.default)(
+										"strong",
+										null,
+										key
+									)
+								),
+								(0, _mithril2.default)(
+									"div",
+									{ "class": "w-70 tl fl" },
+									(0, _mithril2.default)(
+										"span",
+										{ "class": "fw6 ttu lh-copy" },
+										value
+									)
+								)
+							);
+						})
+					)
+				)
+			),
+			(0, _mithril2.default)(
+				"div",
+				{ "class": "bg-gray cf pa3" },
+				(0, _mithril2.default)(
+					"button",
+					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
+					"Print"
+				)
+			)
+		);
+	}
+};
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.Shell = undefined;
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+var _flatpickr = __webpack_require__(5);
+
+var _flatpickr2 = _interopRequireDefault(_flatpickr);
+
+var _svgIcons = __webpack_require__(21);
+
+var _data = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Shell = exports.Shell = {
+	oncreate: function oncreate() {
+		(0, _flatpickr2.default)(document.getElementById("fromDate"), {});
+		(0, _flatpickr2.default)(document.getElementById("toDate"), {});
+	},
+	view: function view(vnode) {
+		return (0, _mithril2.default)(
+			"section",
+			{ "class": "bg-near-white  f6 fw3 navy" },
+			(0, _mithril2.default)(
+				"div",
+				{ "class": "bg-dark-blue white-80 shadow-4 fixed w-100 z-3" },
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "ph5 pa3 cf" },
+					(0, _mithril2.default)(
+						"a",
+						{ "class": "link dib ph2 pv2 ", oncreate: _mithril2.default.route.link, href: "/" },
+						"home"
+					),
+					(0, _mithril2.default)(
+						"a",
+						{
+							"class": "link dib ph2 pv2 ",
+							oncreate: _mithril2.default.route.link,
+							href: "/analytics"
+						},
+						"analytics"
+					),
+					(0, _mithril2.default)(
+						"div",
+						{ "class": "dib pl4" },
+						(0, _mithril2.default)(
+							"span",
+							{ "class": " dib ph2 pv2 " },
+							"search:"
+						),
+						(0, _mithril2.default)(
+							"form",
+							{ "class": "dib pl3 w5 relative" },
+							(0, _mithril2.default)("input", {
+								type: "text",
+								"class": "bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib",
+								placeholder: "form number, name, slot number, etc",
+								style: "outline: none",
+								oninput: _mithril2.default.withAttr("value", function (value) {
+									_data.Data.searchquery = value;
+								})
+							}),
+							(0, _mithril2.default)(
+								"p",
+								{ "class": "mv0 dib w1 h1 absolute pointer", style: "top: 0.5rem; right:0.5rem",
+									onclick: function onclick() {
+										console.log("Search button clicked");
+										_data.Data.Search().then(function (resp) {
+											console.log(resp);
+										}).catch(function (err) {
+											console.log(err);
+										});
+									} },
+								(0, _mithril2.default)(_svgIcons.SVGIcons, { type: "search" })
+							)
+						)
+					),
+					(0, _mithril2.default)(
+						"div",
+						{ "class": "dib fr pv2" },
+						(0, _mithril2.default)(
+							"a",
+							{
+								"class": "bw0 bg-dark-red shadow-4 pv2 ph3  br2 white-90 pointer grow link",
+								style: "background-color:#5889FF",
+								oncreate: _mithril2.default.route.link,
+								href: "/registration"
+							},
+							"New Registration"
+						)
+					)
+				)
+			),
+			(0, _mithril2.default)(
+				"section",
+				{ "class": "pa4 tc " },
+				(0, _mithril2.default)("div", { "class": "pv4" }),
+				(0, _mithril2.default)(
+					"div",
+					{ "class": "dib bb b--gray pa2 pb3" },
+					(0, _mithril2.default)(
+						"div",
+						{ "class": "dib pr3" },
+						(0, _mithril2.default)(
+							"span",
+							{ "class": "dib pr2" },
+							"From: "
+						),
+						(0, _mithril2.default)("input", {
+							type: "text",
+							id: "fromDate",
+							"class": "pv2 ph3 br2 bw1 ba b--gray dib "
+						})
+					),
+					(0, _mithril2.default)(
+						"div",
+						{ "class": "dib " },
+						(0, _mithril2.default)(
+							"span",
+							{ "class": "dib pr2" },
+							"To: "
+						),
+						(0, _mithril2.default)("input", {
+							type: "text",
+							id: "toDate",
+							"class": "pv2 ph3 br2 bw1 ba b--gray dib "
+						})
+					),
+					(0, _mithril2.default)(
+						"div",
+						{ "class": "dib ml3" },
+						(0, _mithril2.default)(
+							"button",
+							{ "class": "bw0  shadow-4 pv2 ph3  br2 pointer grow ma2" },
+							"Search"
+						),
+						(0, _mithril2.default)(
+							"button",
+							{ "class": "bw0 shadow-4 pv2 ph3  br2  pointer grow ma2" },
+							"Clear"
+						)
+					)
+				)
+			),
+			vnode.children
+		);
+	}
+};
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.Icon = exports.SVGIcons = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SVGIcons = exports.SVGIcons = {
+	view: function view(vnode) {
+		switch (vnode.attrs.type) {
+			case "logo-black":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ "class": "w-100", viewBox: "0 0 36 26" }, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						{
+							id: "Welcome",
+							stroke: "none",
+							"stroke-width": "1",
+							fill: "none",
+							"fill-rule": "evenodd"
+						},
+						(0, _mithril2.default)(
+							"g",
+							{
+								id: "Mobile-Portrait-Copy",
+								transform: "translate(-16.000000, -12.000000)"
+							},
+							(0, _mithril2.default)(
+								"g",
+								{ id: "logo", transform: "translate(10.000000, 9.000000)" },
+								(0, _mithril2.default)(
+									"g",
+									{ id: "Group-3", transform: "translate(6.000000, 3.000000)" },
+									(0, _mithril2.default)(
+										"g",
+										{
+											id: "Group-2",
+											transform: "translate(7.973666, 0.000000)",
+											fill: "#2E3938"
+										},
+										(0, _mithril2.default)(
+											"g",
+											{ id: "Group-Copy", "fill-rule": "nonzero" },
+											(0, _mithril2.default)("path", {
+												d: "M0.0436856122,24.7067099 C-0.0427713225,25.4129674 0.487478465,25.9848377 1.22451348,25.9833184 L26.6698414,25.9308675 C27.4084516,25.929345 27.9369572,25.4565539 27.8506693,24.8766868 L25.4856554,8.68075251 C25.3991985,8.07761682 24.7354388,7.50631105 23.9913314,7.40378973 L19.9729071,6.85014088 L19.9729071,5.72693317 C19.9729071,5.72693317 19.9729071,1.23410141 13.9471774,0.156058938 C7.92144775,-0.921983453 7.92144775,3.9673789 7.92144775,3.9673789 L7.92144775,5.18971974 C7.92144775,5.86479994 8.52532656,6.49029414 9.26620998,6.58627691 L15.955754,7.45291925 L15.955754,6.29666717 L9.26049879,5.37421097 L9.26049879,4.16288493 C9.26049879,4.16288493 9.26049879,0.528902807 13.9471774,1.32883321 C18.6338561,2.12876342 18.6338561,5.53142714 18.6338561,5.53142714 L18.6338561,6.66564964 C18.6338561,7.29206343 19.2275287,7.87678349 19.971636,7.97318391 L23.9900603,8.49377794 L26.4673129,24.8614991 L1.42704202,24.7071383 L3.90429462,5.89163123 L5.24334566,6.06510767 L5.24334566,4.82073726 L2.56524357,4.45175478 L0.0436856122,24.7067099 Z",
+												id: "Shape"
+											})
+										),
+										(0, _mithril2.default)("path", {
+											d: "M11.7246818,19.6279318 L9.33430967,19.5601143 L9.45245768,18.8187369 L7.63048009,18.7420307 L8.84101662,12.2597894 L12.4136013,12.9097416 L11.7246818,19.6279318 Z M10.9259389,13.1195253 L10.3827763,17.1530716 L9.88143642,17.1151826 L10.4731534,13.042845 L9.34874816,12.8511441 L8.40513073,18.2686432 L10.208328,18.3613224 L10.1117847,19.0915943 L11.4256977,19.1406799 L12.0654613,13.3112262 L10.9259389,13.1195253 Z M15.8628212,19.744877 L13.4605922,19.6770596 L13.5135401,18.9888025 L11.6781515,18.9120962 L12.3046543,12.8902314 L15.9908743,13.5401836 L15.8628212,19.744877 Z M14.3968514,13.6979063 L14.1917637,17.4388589 L13.6839848,17.4009699 L13.9310344,13.621226 L12.7740505,13.4295251 L12.3002486,18.4683735 L14.1191963,18.5610527 L14.0844072,19.2396905 L15.406662,19.288776 L15.5689524,13.8896072 L14.3968514,13.6979063 Z M19.6514083,14.1660832 L19.9913705,19.8609796 L15.7045676,19.7404153 L15.8523716,13.516131 L19.6514083,14.1660832 Z M15.9895113,13.9579638 L15.8788198,19.3062789 L19.065878,19.4240843 L18.8558503,14.4180458 L15.9895113,13.9579638 Z M17.6702826,15.2353428 L17.721007,18.3249808 L17.2008244,18.2939373 L17.182182,15.1700717 L17.6702826,15.2353428 Z",
+											id: "440-copy",
+											stroke: "#2E3938",
+											"stroke-width": "0.5"
+										})
+									),
+									(0, _mithril2.default)("rect", {
+										id: "Rectangle-2",
+										fill: "#2D3938",
+										transform: "translate(6.178707, 7.702437) rotate(8.000000) translate(-6.178707, -7.702437) ",
+										x: "3.40463511",
+										y: "6.94062199",
+										width: "5.54814319",
+										height: "1.52362949"
+									}),
+									(0, _mithril2.default)("rect", {
+										id: "Rectangle-2-Copy-2",
+										fill: "#2D3938",
+										transform: "translate(4.087669, 13.256233) rotate(8.000000) translate(-4.087669, -13.256233) ",
+										x: "0.0987211391",
+										y: "12.4944185",
+										width: "7.97789668",
+										height: "1.52362949"
+									}),
+									(0, _mithril2.default)("rect", {
+										id: "Rectangle-2-Copy",
+										fill: "#2D3938",
+										transform: "translate(4.743779, 18.878940) rotate(7.000000) translate(-4.743779, -18.878940) ",
+										x: "1.96970713",
+										y: "18.1171252",
+										width: "5.54814319",
+										height: "1.52362949"
+									})
+								)
+							)
+						)
+					)
+				);
+			case "logo-white":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, {
+						viewBox: "0 0 36 26"
+					}),
+					(0, _mithril2.default)("style", null),
+					(0, _mithril2.default)(
+						"g",
+						{ fill: "none" },
+						(0, _mithril2.default)(
+							"g",
+							{ fill: "#fff" },
+							(0, _mithril2.default)("path", { d: "M8 24.7C7.9 25.4 8.5 26 9.2 26L34.6 25.9C35.4 25.9 35.9 25.5 35.8 24.9L33.5 8.7C33.4 8.1 32.7 7.5 32 7.4L27.9 6.9 27.9 5.7C27.9 5.7 27.9 1.2 21.9 0.2 15.9-0.9 15.9 4 15.9 4L15.9 5.2C15.9 5.9 16.5 6.5 17.2 6.6L23.9 7.5 23.9 6.3 17.2 5.4 17.2 4.2C17.2 4.2 17.2 0.5 21.9 1.3 26.6 2.1 26.6 5.5 26.6 5.5L26.6 6.7C26.6 7.3 27.2 7.9 27.9 8L32 8.5 34.4 24.9 9.4 24.7 11.9 5.9 13.2 6.1 13.2 4.8 10.5 4.5 8 24.7Z" }),
+							(0, _mithril2.default)("path", {
+								d: "M19.7 19.6L17.3 19.6 17.4 18.8 15.6 18.7 16.8 12.3 20.4 12.9 19.7 19.6ZM18.9 13.1L18.4 17.2 17.9 17.1 18.4 13 17.3 12.9 16.4 18.3 18.2 18.4 18.1 19.1 19.4 19.1 20 13.3 18.9 13.1ZM23.8 19.7L21.4 19.7 21.5 19 19.7 18.9 20.3 12.9 24 13.5 23.8 19.7ZM22.4 13.7L22.2 17.4 21.7 17.4 21.9 13.6 20.7 13.4 20.3 18.5 22.1 18.6 22.1 19.2 23.4 19.3 23.5 13.9 22.4 13.7ZM27.6 14.2L28 19.9 23.7 19.7 23.8 13.5 27.6 14.2ZM24 14L23.9 19.3 27 19.4 26.8 14.4 24 14ZM25.6 15.2L25.7 18.3 25.2 18.3 25.2 15.2 25.6 15.2Z",
+								style: "stroke-width:0.5;stroke:#fff"
+							})
+						),
+						(0, _mithril2.default)("rect", {
+							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(6.178707 7.702437)rotate(8)",
+							x: "-2.8",
+							y: "-0.8",
+							width: "5.5",
+							height: "1.5",
+							"class": "a"
+						}),
+						(0, _mithril2.default)("rect", {
+							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(4.087669 13.256233)rotate(8)",
+							x: "-4",
+							y: "-0.8",
+							width: "8",
+							height: "1.5",
+							"class": "a"
+						}),
+						(0, _mithril2.default)("rect", {
+							transform: "translate(-16 -12)translate(10 9)translate(6 3)translate(4.743779 18.87894)rotate(7)",
+							x: "-2.8",
+							y: "-0.8",
+							width: "5.5",
+							height: "1.5",
+							"class": "a",
+							fill: "#fff"
+						})
+					)
+				);
+			case "facebook":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						viewBox: "0 0 32 32",
+						role: "presentation",
+						"aria-hidden": "true",
+						focusable: "false"
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", {
+						"fill-rule": "evenodd",
+						d: "M8 14.408v-4.165c0-.424.35-.812.77-.812h2.519V7.347c0-4.84 2.484-7.311 7.42-7.347 1.645 0 3.219.212 4.692.636.455.141.63.424.595.883l-.56 4.062c-.035.178-.14.354-.315.531-.21.105-.42.176-.63.14-.875-.247-1.784-.352-2.799-.352-1.399 0-1.61.283-1.61 1.73v1.8H22.6c.42 0 .805.423.805.883l-.349 4.17c0 .422-.35.705-.77.705H18.08v16c0 .424-.349.812-.769.812h-5.213c-.42 0-.804-.388-.804-.812V15.185h-2.52A.781.781 0 0 1 8 14.408"
+					})
+				);
+			case "google":
+				return (0, _mithril2.default)(
+					"svg",
+					{ width: "30px", height: "30px", viewBox: "10 10 25 25", version: "1.1", xmlns: "http://www.w3.org/2000/svg" },
+					(0, _mithril2.default)(
+						"title",
+						null,
+						"btn_google_light_normal_ios"
+					),
+					(0, _mithril2.default)(
+						"desc",
+						null,
+						"Created with Sketch."
+					),
+					(0, _mithril2.default)(
+						"defs",
+						null,
+						(0, _mithril2.default)(
+							"filter",
+							{ x: "-50%", y: "-50%", width: "200%", height: "200%", filterUnits: "objectBoundingBox", id: "filter-1" },
+							(0, _mithril2.default)("feOffset", { dx: "0", dy: "1", "in": "SourceAlpha", result: "shadowOffsetOuter1" }),
+							(0, _mithril2.default)("feGaussianBlur", { stdDeviation: "0.5", "in": "shadowOffsetOuter1", result: "shadowBlurOuter1" }),
+							(0, _mithril2.default)("feColorMatrix", { values: "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.168 0", "in": "shadowBlurOuter1", type: "matrix", result: "shadowMatrixOuter1" }),
+							(0, _mithril2.default)("feOffset", { dx: "0", dy: "0", "in": "SourceAlpha", result: "shadowOffsetOuter2" }),
+							(0, _mithril2.default)("feGaussianBlur", { stdDeviation: "0.5", "in": "shadowOffsetOuter2", result: "shadowBlurOuter2" }),
+							(0, _mithril2.default)("feColorMatrix", { values: "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.084 0", "in": "shadowBlurOuter2", type: "matrix", result: "shadowMatrixOuter2" }),
+							(0, _mithril2.default)(
+								"feMerge",
+								null,
+								(0, _mithril2.default)("feMergeNode", { "in": "shadowMatrixOuter1" }),
+								(0, _mithril2.default)("feMergeNode", { "in": "shadowMatrixOuter2" }),
+								(0, _mithril2.default)("feMergeNode", { "in": "SourceGraphic" })
+							)
+						),
+						(0, _mithril2.default)("rect", { id: "path-2", x: "0", y: "0", width: "40", height: "40", rx: "2" })
+					),
+					(0, _mithril2.default)(
+						"g",
+						{ id: "Google-Button", stroke: "none", "stroke-width": "1", fill: "none", "fill-rule": "evenodd" },
+						(0, _mithril2.default)("g", { id: "9-PATCH", transform: "translate(-608.000000, -160.000000)" }),
+						(0, _mithril2.default)(
+							"g",
+							{ id: "btn_google_light_normal", transform: "translate(-1.000000, -1.000000)" },
+							(0, _mithril2.default)(
+								"g",
+								{ id: "button", transform: "translate(4.000000, 4.000000)", filter: "url(#filter-1)" },
+								(0, _mithril2.default)(
+									"g",
+									{ id: "button-bg" },
+									(0, _mithril2.default)("use", { fill: "#FFFFFF", "fill-rule": "evenodd" }),
+									(0, _mithril2.default)("use", { fill: "none" }),
+									(0, _mithril2.default)("use", { fill: "none" }),
+									(0, _mithril2.default)("use", { fill: "none" })
+								)
+							),
+							(0, _mithril2.default)(
+								"g",
+								{ id: "logo_googleg_48dp", transform: "translate(15.000000, 15.000000)" },
+								(0, _mithril2.default)("path", { d: "M17.64,9.20454545 C17.64,8.56636364 17.5827273,7.95272727 17.4763636,7.36363636 L9,7.36363636 L9,10.845 L13.8436364,10.845 C13.635,11.97 13.0009091,12.9231818 12.0477273,13.5613636 L12.0477273,15.8195455 L14.9563636,15.8195455 C16.6581818,14.2527273 17.64,11.9454545 17.64,9.20454545 L17.64,9.20454545 Z", id: "Shape", fill: "#4285F4" }),
+								(0, _mithril2.default)("path", { d: "M9,18 C11.43,18 13.4672727,17.1940909 14.9563636,15.8195455 L12.0477273,13.5613636 C11.2418182,14.1013636 10.2109091,14.4204545 9,14.4204545 C6.65590909,14.4204545 4.67181818,12.8372727 3.96409091,10.71 L0.957272727,10.71 L0.957272727,13.0418182 C2.43818182,15.9831818 5.48181818,18 9,18 L9,18 Z", id: "Shape", fill: "#34A853" }),
+								(0, _mithril2.default)("path", { d: "M3.96409091,10.71 C3.78409091,10.17 3.68181818,9.59318182 3.68181818,9 C3.68181818,8.40681818 3.78409091,7.83 3.96409091,7.29 L3.96409091,4.95818182 L0.957272727,4.95818182 C0.347727273,6.17318182 0,7.54772727 0,9 C0,10.4522727 0.347727273,11.8268182 0.957272727,13.0418182 L3.96409091,10.71 L3.96409091,10.71 Z", id: "Shape", fill: "#FBBC05" }),
+								(0, _mithril2.default)("path", { d: "M9,3.57954545 C10.3213636,3.57954545 11.5077273,4.03363636 12.4404545,4.92545455 L15.0218182,2.34409091 C13.4631818,0.891818182 11.4259091,0 9,0 C5.48181818,0 2.43818182,2.01681818 0.957272727,4.95818182 L3.96409091,7.29 C4.67181818,5.16272727 6.65590909,3.57954545 9,3.57954545 L9,3.57954545 Z", id: "Shape", fill: "#EA4335" }),
+								(0, _mithril2.default)("path", { d: "M0,0 L18,0 L18,18 L0,18 L0,0 Z", id: "Shape" })
+							),
+							(0, _mithril2.default)("g", { id: "handles_square" })
+						)
+					)
+				);
+			case "email":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						viewBox: "0 0 24 24",
+						role: "presentation",
+						"aria-hidden": "true",
+						focusable: "false",
+						style: "fill: currentcolor;"
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", {
+						"fill-rule": "evenodd",
+						d: "M22.497 4H1.503C.665 4 0 4.673 0 5.507v12.985C0 19.326.672 20 1.503 20h20.994A1.5 1.5 0 0 0 24 18.492V5.507C24 4.674 23.328 4 22.497 4zM23 18.203l-6.141-7.907L23 5.628v12.575zM22.174 5l-9.685 7.362c-.259.196-.719.196-.977 0L1.827 5h20.347zM1 5.628l6.14 4.667L1 18.185V5.629zM1.634 19l6.302-8.1 2.97 2.258c.616.468 1.572.468 2.188 0l2.969-2.257L22.353 19H1.633z"
+					})
+				);
+			case "location":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						width: "17",
+						height: "25",
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						viewBox: "0 0 54.757 54.757",
+						style: "enable-background:new 0 0 54.757 54.757;"
+
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", { d: "M27.557,12c-3.859,0-7,3.141-7,7s3.141,7,7,7s7-3.141,7-7S31.416,12,27.557,12z M27.557,24c-2.757,0-5-2.243-5-5\r s2.243-5,5-5s5,2.243,5,5S30.314,24,27.557,24z" }),
+					(0, _mithril2.default)("path", { d: "M40.94,5.617C37.318,1.995,32.502,0,27.38,0c-5.123,0-9.938,1.995-13.56,5.617c-6.703,6.702-7.536,19.312-1.804,26.952\r L27.38,54.757L42.721,32.6C48.476,24.929,47.643,12.319,40.94,5.617z M41.099,31.431L27.38,51.243L13.639,31.4\r C8.44,24.468,9.185,13.08,15.235,7.031C18.479,3.787,22.792,2,27.38,2s8.901,1.787,12.146,5.031\r C45.576,13.08,46.321,24.468,41.099,31.431z" })
+				);
+			case "search":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						x: "0px",
+						y: "0px",
+						viewBox: "0 0 56.966 56.966",
+						style: "enable-background:new 0 0 56.966 56.966; "
+					}, vnode.attrs),
+					(0, _mithril2.default)("path", {
+						d: "M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23\r s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92\r c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17\r s-17-7.626-17-17S14.61,6,23.984,6z",
+						fill: "gray"
+					})
+				);
+			case "down":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						x: "0px",
+						y: "0px",
+						viewBox: "0 0 256 256",
+						style: "enable-background:new 0 0 256 256;"
+					}, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("polygon", { points: "225.813,48.907 128,146.72 30.187,48.907 0,79.093 128,207.093 256,79.093" })
+						)
+					)
+				);
+
+			case "up":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({
+						version: "1.1",
+						id: "Capa_1",
+						xmlns: "http://www.w3.org/2000/svg",
+						x: "0px",
+						y: "0px",
+						viewBox: "0 0 256 256",
+						style: "enable-background:new 0 0 256 256;"
+					}, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("polygon", { points: "128,48.907 0,176.907 30.187,207.093 128,109.28 225.813,207.093 256,176.907 \t\t" })
+						)
+					)
+				);
+			case "bag":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { viewBox: "0 0 19 18", version: "1.1" }),
+					(0, _mithril2.default)(
+						"g",
+						{
+							id: "Welcome",
+							stroke: "none",
+							"stroke-width": "1",
+							fill: "none",
+							"fill-rule": "evenodd"
+						},
+						(0, _mithril2.default)(
+							"g",
+							{
+								id: "Mobile-Portrait-Copy-2",
+								transform: "translate(-179.000000, -730.000000)",
+								"fill-rule": "nonzero",
+								fill: "#000000"
+							},
+							(0, _mithril2.default)(
+								"g",
+								{
+									id: "shopping-basket-button-copy",
+									transform: "translate(179.000000, 730.000000)"
+								},
+								(0, _mithril2.default)("path", {
+									d: "M14.1167266,6.59969262 L10.282554,0.391905738 C10.1082392,0.203790984 9.84685252,0.0156762295 9.58543165,0.0156762295 C9.32401079,0.0156762295 9.06258993,0.109733607 8.88830935,0.391905738 L5.05413669,6.59969262 L0.871402878,6.59969262 C0.348561151,6.59969262 0,6.97592213 0,7.54026639 L0,7.82243852 L2.17850719,16.5697746 C2.35278777,17.3222336 3.04991007,17.9806352 3.83417266,17.9806352 L15.1624101,17.9806352 C15.9466727,17.9806352 16.643795,17.416291 16.8180755,16.5697746 L18.9965827,7.82243852 L18.9965827,7.54026639 C18.9965827,6.97592213 18.6480216,6.59969262 18.1251799,6.59969262 L14.1167266,6.59969262 Z M6.97122302,6.59969262 L9.58543165,2.46116803 L12.1996403,6.59969262 L6.97122302,6.59969262 Z M9.58543165,14.1242828 C8.62688849,14.1242828 7.8426259,13.2777664 7.8426259,12.2431352 C7.8426259,11.2085041 8.62688849,10.3619877 9.58543165,10.3619877 C10.5439748,10.3619877 11.3282374,11.2085041 11.3282374,12.2431352 C11.3282374,13.2777664 10.5439748,14.1242828 9.58543165,14.1242828 Z",
+									id: "Shape"
+								})
+							)
+						)
+					)
+				);
+			case "wishlist":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { viewBox: "0 0 25 15" }),
+					(0, _mithril2.default)(
+						"g",
+						{ id: "Welcome", stroke: "none", "stroke-width": "1", fill: "none", "fill-rule": "evenodd" },
+						(0, _mithril2.default)(
+							"g",
+							{ id: "Mobile-Portrait-Copy-2", transform: "translate(-23.000000, -732.000000)", "fill-rule": "nonzero", fill: "#030104" },
+							(0, _mithril2.default)(
+								"g",
+								{ id: "add-to-list-copy", transform: "translate(23.000000, 732.500000)" },
+								(0, _mithril2.default)("path", { d: "M10,7 C10,7.784 9.45,8.4 8.75,8.4 L1.25,8.4 C0.55,8.4 0,7.784 0,7 C0,6.216 0.55,5.6 1.25,5.6 L8.75,5.6 C9.45,5.6 10,6.216 10,7 Z M8.75,11.2 L1.25,11.2 C0.55,11.2 0,11.816 0,12.6 C0,13.384 0.55,14 1.25,14 L8.75,14 C9.45,14 10,13.384 10,12.6 C10,11.816 9.45,11.2 8.75,11.2 Z M24.25,5.6 L20,5.6 L20,0.84 C20,0.056 19.45,0 18.75,0 C18.05,0 17.5,0.056 17.5,0.84 L17.5,5.6 L13.375,5.6 C12.675,5.6 12.625,6.216 12.625,7 C12.625,7.784 12.675,8.4 13.375,8.4 L17.5,8.4 L17.5,13.16 C17.5,13.944 18.05,14 18.75,14 C19.45,14 20,13.944 20,13.16 L20,8.4 L24.25,8.4 C24.95,8.4 25,7.784 25,7 C25,6.216 24.95,5.6 24.25,5.6 Z M8.75,0 L1.25,0 C0.55,0 0,0.616 0,1.4 C0,2.184 0.55,2.8 1.25,2.8 L8.75,2.8 C9.45,2.8 10,2.184 10,1.4 C10,0.616 9.45,0 8.75,0 Z", id: "Shape" })
+							)
+						)
+					)
+				);
+			case "logout":
+				return (0, _mithril2.default)(
+					"svg",
+					{ version: "1.1", id: "Capa_1", xmlns: "http://www.w3.org/2000/svg", x: "0px", y: "0px",
+						viewBox: "0 0 490.667 490.667", style: "enable-background:new 0 0 490.667 490.667;" },
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("path", { d: "M330.667,192c5.888,0,10.667-4.779,10.667-10.667v-128C341.333,23.936,317.419,0,288,0H53.333C23.915,0,0,23.936,0,53.333\r v384c0,29.397,23.915,53.333,53.333,53.333H288c29.419,0,53.333-23.936,53.333-53.333v-128c0-5.888-4.779-10.667-10.667-10.667\r S320,303.445,320,309.333v128c0,17.643-14.357,32-32,32H53.333c-17.643,0-32-14.357-32-32v-384c0-17.643,14.357-32,32-32H288\r c17.643,0,32,14.357,32,32v128C320,187.221,324.779,192,330.667,192z" })
+						)
+					),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("path", { d: "M480,234.667H138.667c-5.888,0-10.667,4.779-10.667,10.667S132.779,256,138.667,256H480\r c5.888,0,10.667-4.779,10.667-10.667S485.888,234.667,480,234.667z" })
+						)
+					),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)(
+							"g",
+							null,
+							(0, _mithril2.default)("path", { d: "M487.531,237.824l-64-64c-4.16-4.16-10.923-4.16-15.083,0c-4.16,4.16-4.16,10.923,0,15.083l56.448,56.448l-56.448,56.448\r c-4.16,4.16-4.16,10.923,0,15.083c2.091,2.069,4.821,3.115,7.552,3.115c2.731,0,5.461-1.045,7.531-3.093l64-64\r C491.691,248.747,491.691,241.984,487.531,237.824z" })
+						)
+					)
+				);
+
+			case "loader":
+				return (0, _mithril2.default)(
+					"div",
+					{ "class": "dib w-100 tc" },
+					(0, _mithril2.default)(
+						"svg",
+						{ width: "38", height: "38", viewBox: "0 0 38 38", xmlns: "http://www.w3.org/2000/svg" },
+						(0, _mithril2.default)(
+							"defs",
+							null,
+							(0, _mithril2.default)(
+								"linearGradient",
+								{ x1: "8.042%", y1: "0%", x2: "65.682%", y2: "23.865%", id: "a" },
+								(0, _mithril2.default)("stop", { "stop-color": "#000", "stop-opacity": "0", offset: "0%" }),
+								(0, _mithril2.default)("stop", { "stop-color": "#000", "stop-opacity": ".631", offset: "63.146%" }),
+								(0, _mithril2.default)("stop", { "stop-color": "#000", offset: "100%" })
+							)
+						),
+						(0, _mithril2.default)(
+							"g",
+							{ fill: "none", "fill-rule": "evenodd" },
+							(0, _mithril2.default)(
+								"g",
+								{ transform: "translate(1 1)" },
+								(0, _mithril2.default)(
+									"path",
+									{ d: "M36 18c0-9.94-8.06-18-18-18", id: "Oval-2", stroke: "url(#a)", "stroke-width": "2" },
+									(0, _mithril2.default)("animateTransform", {
+										attributeName: "transform",
+										type: "rotate",
+										from: "0 18 18",
+										to: "360 18 18",
+										dur: "0.9s",
+										repeatCount: "indefinite" })
+								),
+								(0, _mithril2.default)(
+									"circle",
+									{ fill: "#fff", cx: "36", cy: "18", r: "1" },
+									(0, _mithril2.default)("animateTransform", {
+										attributeName: "transform",
+										type: "rotate",
+										from: "0 18 18",
+										to: "360 18 18",
+										dur: "0.9s",
+										repeatCount: "indefinite" })
+								)
+							)
+						)
+					)
+				);
+			case "phone":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ version: "1.1", id: "Capa_1", xmlns: "http://www.w3.org/2000/svg", x: "0px", y: "0px",
+						viewBox: "0 0 29.731 29.731", style: "enable-background:new 0 0 29.731 29.731;" }, vnode.attrs),
+					(0, _mithril2.default)(
+						"g",
+						null,
+						(0, _mithril2.default)("path", { d: "M23.895,29.731c-1.237,0-2.731-0.31-4.374-0.93c-3.602-1.358-7.521-4.042-11.035-7.556\r c-3.515-3.515-6.199-7.435-7.558-11.037C-0.307,6.933-0.31,4.245,0.921,3.015c0.177-0.177,0.357-0.367,0.543-0.563\r c1.123-1.181,2.392-2.51,4.074-2.45C6.697,0.05,7.82,0.77,8.97,2.201c3.398,4.226,1.866,5.732,0.093,7.478l-0.313,0.31\r c-0.29,0.29-0.838,1.633,4.26,6.731c1.664,1.664,3.083,2.882,4.217,3.619c0.714,0.464,1.991,1.166,2.515,0.642l0.315-0.318\r c1.744-1.769,3.25-3.296,7.473,0.099c1.431,1.15,2.15,2.272,2.198,3.433c0.069,1.681-1.27,2.953-2.452,4.075\r c-0.195,0.186-0.385,0.366-0.562,0.542C26.103,29.424,25.126,29.731,23.895,29.731z M5.418,1C4.223,1,3.144,2.136,2.189,3.141\r C1.997,3.343,1.811,3.539,1.628,3.722C0.711,4.638,0.804,7.045,1.864,9.856c1.31,3.472,3.913,7.266,7.33,10.683\r c3.416,3.415,7.208,6.018,10.681,7.327c2.811,1.062,5.218,1.152,6.133,0.237c0.183-0.183,0.379-0.369,0.581-0.56\r c1.027-0.976,2.192-2.082,2.141-3.309c-0.035-0.843-0.649-1.75-1.825-2.695c-3.519-2.83-4.503-1.831-6.135-0.176l-0.32,0.323\r c-0.78,0.781-2.047,0.608-3.767-0.51c-1.193-0.776-2.667-2.038-4.379-3.751c-4.231-4.23-5.584-6.819-4.26-8.146l0.319-0.315\r c1.659-1.632,2.66-2.617-0.171-6.138C7.245,1.651,6.339,1.037,5.496,1.001C5.47,1,5.444,1,5.418,1z" })
+					)
+				);
+			default:
+				return "not found";
+		}
+	}
+};
+
+var Icon = exports.Icon = {
+
+	view: function view(vnode) {
+		var name = vnode.attrs.name;
+
+		switch (name) {
+			case "list":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 511.6 511.6" }),
+					(0, _mithril2.default)("path", { d: "M118.8 201H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 214.3 0 220.8 0 228.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4S126.4 201 118.8 201z" }),
+					(0, _mithril2.default)("path", { d: "M118.8 54.8H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 68.1 0 74.6 0 82.2v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8s8-11.8 8-19.4V82.2c0-7.6-2.7-14.1-8-19.4C132.9 57.5 126.4 54.8 118.8 54.8z" }),
+					(0, _mithril2.default)("path", { d: "M118.8 347.2H27.4c-7.6 0-14.1 2.7-19.4 8C2.7 360.5 0 367 0 374.6v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h91.4c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4S126.4 347.2 118.8 347.2z" }),
+					(0, _mithril2.default)("path", { d: "M484.2 201H210.1c-7.6 0-14.1 2.7-19.4 8s-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4C498.3 203.7 491.8 201 484.2 201z" }),
+					(0, _mithril2.default)("path", { d: "M484.2 347.2H210.1c-7.6 0-14.1 2.7-19.4 8 -5.3 5.3-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8 5.3-5.3 8-11.8 8-19.4v-54.8c0-7.6-2.7-14.1-8-19.4C498.3 349.8 491.8 347.2 484.2 347.2z" }),
+					(0, _mithril2.default)("path", { d: "M503.6 62.8c-5.3-5.3-11.8-8-19.4-8H210.1c-7.6 0-14.1 2.7-19.4 8s-8 11.8-8 19.4v54.8c0 7.6 2.7 14.1 8 19.4 5.3 5.3 11.8 8 19.4 8h274.1c7.6 0 14.1-2.7 19.4-8s8-11.8 8-19.4V82.2C511.6 74.6 509 68.1 503.6 62.8z" })
+				);
+			//break;
+			case "home":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 39.4 39.4" }),
+					(0, _mithril2.default)("path", { d: "M33.6 21v12.4c0 1.1-0.9 2-2 2H7.8c-1.1 0-2-0.9-2-2V21c0-0.7 0.4-1.3 0.9-1.7l11.9-7.4c0.6-0.4 1.5-0.4 2.1 0l11.9 7.4C33.3 19.6 33.6 20.3 33.6 21zM38.5 15.4L20.8 4.4c-0.6-0.4-1.5-0.4-2.1 0L0.9 15.4c-0.9 0.6-1.2 1.8-0.6 2.8 0.6 0.9 1.8 1.2 2.8 0.6L19.7 8.4l16.6 10.4c0.3 0.2 0.7 0.3 1.1 0.3 0.7 0 1.3-0.3 1.7-0.9C39.7 17.2 39.4 16 38.5 15.4z" })
+				);
+			case "user":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 258.8 258.8" }),
+					(0, _mithril2.default)("circle", { cx: "129.4", cy: "60", r: "60" }),
+					(0, _mithril2.default)("path", { d: "M129.4 150c-60.1 0-108.7 48.7-108.7 108.8h217.5C238.1 198.7 189.4 150 129.4 150z" })
+				);
+			case "search":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, {
+						viewBox: "0 0 250.3 250.3" }),
+					(0, _mithril2.default)("path", { d: "M244.2 214.6l-54.4-54.4c-0.3-0.3-0.6-0.5-0.9-0.8 10.7-16.2 16.9-35.7 16.9-56.6C205.8 46.1 159.7 0 102.9 0S0 46.1 0 102.9c0 56.8 46.1 102.9 102.9 102.9 20.9 0 40.3-6.2 56.6-16.9 0.3 0.3 0.5 0.6 0.8 0.9l54.4 54.4c8.2 8.2 21.4 8.2 29.6 0C252.4 236 252.4 222.8 244.2 214.6zM102.9 170.1c-37.1 0-67.2-30.1-67.2-67.2 0-37.1 30.1-67.2 67.2-67.2 37.1 0 67.2 30.1 67.2 67.2C170.1 140 140 170.1 102.9 170.1z" })
+				);
+			case "search-online":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg" }, vnode.attrs, { viewBox: "0 0 512 512" }),
+					(0, _mithril2.default)("path", { d: "M472.2 34.6H39.8C17.8 34.6 0 52.4 0 74.4v45.3c0 3.1 2.5 5.7 5.7 5.7h500.6c3.1 0 5.7-2.5 5.7-5.7V74.4C512 52.4 494.2 34.6 472.2 34.6zM71.8 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8c7.1 0 12.8 5.7 12.8 12.8C84.6 87.1 78.9 92.8 71.8 92.8zM113 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8 12.8 5.7 12.8 12.8C125.8 87.1 120 92.8 113 92.8zM154.1 92.8c-7.1 0-12.8-5.7-12.8-12.8s5.7-12.8 12.8-12.8c7.1 0 12.8 5.7 12.8 12.8C166.9 87.1 161.2 92.8 154.1 92.8z" }),
+					(0, _mithril2.default)("path", { d: "M353.3 286.9c-7.2 7.2-7.2 18.9 0 26.1 7.2 7.2 18.9 7.2 26.1 0 7.2-7.2 7.2-18.9 0-26.1C372.2 279.7 360.5 279.7 353.3 286.9z" }),
+					(0, _mithril2.default)("path", { d: "M506.3 148.2H5.7c-3.1 0-5.7 2.5-5.7 5.7v283.7c0 22 17.8 39.8 39.8 39.8h432.4c22 0 39.8-17.8 39.8-39.8V153.8C512 150.7 509.5 148.2 506.3 148.2zM300.2 366.8H90.2c-6.3 0-11.4-5.1-11.4-11.4 0-6.3 5.1-11.4 11.4-11.4h210c6.3 0 11.4 5.1 11.4 11.4C311.5 361.7 306.4 366.8 300.2 366.8zM429.9 363.5c-4.4 4.4-11.6 4.4-16.1 0l-27.5-27.5c-15.8 8.7-35.9 6.3-49.1-6.9 -16.1-16.1-16.1-42.2 0-58.3 16.1-16.1 42.2-16.1 58.3 0 13.3 13.3 15.6 33.4 6.9 49.1l27.5 27.5C434.3 351.8 434.3 359 429.9 363.5z" })
+				);
+			case "front-store-black":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, { viewBox: "0 0 459 459" }),
+					(0, _mithril2.default)("path", { d: "M433.5 25.5h-408v51h408V25.5zM459 280.5v-51L433.5 102h-408L0 229.5v51h25.5v153h255v-153h102v153h51v-153H459zM229.5 382.5h-153v-102h153V382.5z" })
+				);
+			case "shopper-at-store":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 488.2 488.2" }),
+					(0, _mithril2.default)("path", { d: "M340.8 121.2c0 3 2.4 5.4 5.4 5.4h15.9c3 0 5.4-2.4 5.4-5.4V93h-26.8V121.2z" }),
+					(0, _mithril2.default)("path", { d: "M277.1 228c1.9 0.8 3.9 1.1 5.9 1.1 6.6 0 12.9-4 15.4-10.6l12-31.4v5.3h19.3V136.5 94.4v-1.4h-4.9c0 0 0 0 0 0 -8.6 0-14.9 2.8-17.6 10.1L267.6 206.7c-0.9 2.3-1.1 4.6-1 6.9 4.3 3.7 7.7 8.4 9.7 13.9C276.6 227.6 276.8 227.9 277.1 228z" }),
+					(0, _mithril2.default)("path", { d: "M354.2 78.7c19 0 34.4-17.6 34.4-39.3C388.6 17.6 373.2 0 354.2 0c-19 0-34.4 17.6-34.4 39.3C319.8 61.1 335.2 78.7 354.2 78.7z" }),
+					(0, _mithril2.default)("path", { d: "M131.5 154c20 0 36.3-18.6 36.3-41.5 0-22.9-16.2-41.5-36.3-41.5 -20 0-36.2 18.6-36.2 41.5C95.3 135.4 111.5 154 131.5 154z" }),
+					(0, _mithril2.default)("path", { d: "M398.2 187.5l11.8 31c2.5 6.6 8.8 10.6 15.4 10.6 2 0 3.9-0.3 5.9-1.1 8.5-3.2 12.8-12.8 9.6-21.3l-39.5-103.5c-2.8-7.3-9.7-10.1-17.6-10.1h-4.9v99.3h19.3L398.2 187.5z" }),
+					(0, _mithril2.default)("path", { d: "M469.2 234.8h-71l-0.1-30.9h-13.2v25.6c0 2-0.8 3.8-2 5.3h-57.5c-1.2-1.5-2-3.3-2-5.3v-25.6h-13.1v30.9h-32.2c0 0.2 0.1 0.3 0.1 0.5 1.7 14-5.4 27.1-16.9 33.7h190.7v79.1H432.9v-15.1c0-6.3-5.1-11.4-11.4-11.4h-17.7v-14c0-6.3-5.1-11.4-11.4-11.4h-39.5c-6.3 0-11.4 5.1-11.4 11.4v14h-13.6c-6.3 0-11.4 5.1-11.4 11.4v15.1h-37.2v-15.1c0-6.3-5.1-11.4-11.4-11.4h-34.4c-6.3 0-11.4 5.1-11.4 11.4v15.1h-44.4l0.3-79.1v-33.2l12.4 18.2c3.3 4.8 8.7 7.6 14.4 7.6 0.7 0 1.4 0 2.1-0.1l39.8-4.8c9.5-1.1 16.3-9.8 15.2-19.4 -1.2-9.5-9.6-16.4-19.4-15.2l-29.3 3.5 -33.7-49.4c-4.1-6.1-10.7-7.1-18.2-7.1h-60.5c-8.8 0-16 3.1-18.8 11L42 289.7c-2.8 7.8 0.5 16 7.1 20.3v35.9H13.3c-3.9 0-7.5 2-9.6 5.2 -2.1 3.3-2.4 7.4-0.8 10.9l23.9 53c1.8 4.1 5.9 6.7 10.4 6.7h48.4v45.6c0 11.5 9.3 20.9 20.9 20.9 11.5 0 20.9-9.3 20.9-20.9V349.5h8.3v117.8c0 11.5 9.4 20.9 20.9 20.9 11.5 0 20.9-9.3 20.9-20.9v-5.1h288.3c11.3 0 20.6-9.2 20.6-20.6V251.9C486.3 242.4 478.7 234.8 469.2 234.8zM66.3 345.9v-35c3.8-1.9 6.9-5.1 8.5-9.4l10.6-29.2 0.4 73.6H66.3zM452.1 428.1h-48.3v-7.6c0-6.3-5.1-11.4-11.4-11.4h-24.8v-9.8c0-6.3-5.1-11.4-11.4-11.4h-57.3c-6.3 0-11.4 5.1-11.4 11.4v28.8h-36.9v-17.1c0-6.3-5.1-11.4-11.4-11.4h-37.5c-6.3 0-11.4 5.1-11.4 11.4v17.1h-12.7v-62.9h274.6V428.1z" })
+				);
+			case "close":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({ xmlns: "http://www.w3.org/2000/svg"
+					}, vnode.attrs, {
+						viewBox: "0 0 23.3 23.3" }),
+					(0, _mithril2.default)("path", { d: "M16 11.7L22.6 5.1c1-1 1-2.5 0-3.5l-0.9-0.9c-1-1-2.5-1-3.5 0L11.7 7.3 5.1 0.7c-1-1-2.5-1-3.5 0L0.7 1.6c-1 1-1 2.5 0 3.5l6.6 6.6 -6.6 6.6c-1 1-1 2.5 0 3.5l0.9 0.9c1 1 2.5 1 3.5 0l6.6-6.6 6.6 6.6c1 1 2.5 1 3.5 0l0.9-0.9c1-1 1-2.5 0-3.5L16 11.7z" })
+				);
+			case "location":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 54.8 54.8" }),
+					(0, _mithril2.default)("path", { d: "M27.6 12c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7S31.4 12 27.6 12zM27.6 24c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5S30.3 24 27.6 24z" }),
+					(0, _mithril2.default)("path", { d: "M40.9 5.6C37.3 2 32.5 0 27.4 0c-5.1 0-9.9 2-13.6 5.6 -6.7 6.7-7.5 19.3-1.8 27L27.4 54.8 42.7 32.6C48.5 24.9 47.6 12.3 40.9 5.6zM41.1 31.4L27.4 51.2 13.6 31.4C8.4 24.5 9.2 13.1 15.2 7 18.5 3.8 22.8 2 27.4 2s8.9 1.8 12.1 5C45.6 13.1 46.3 24.5 41.1 31.4z" })
+				);
+			case "add-to-list":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 100 100" }),
+					(0, _mithril2.default)("path", { d: "M40 50c0 2.8-2.2 5-5 5H5c-2.8 0-5-2.2-5-5s2.2-5 5-5h30C37.8 45 40 47.2 40 50zM35 65H5c-2.8 0-5 2.2-5 5s2.2 5 5 5h30c2.8 0 5-2.2 5-5S37.8 65 35 65zM97 45H80V28c0-2.8-2.2-3-5-3s-5 0.2-5 3v17H53.5c-2.8 0-3 2.2-3 5s0.2 5 3 5H70v17c0 2.8 2.2 3 5 3s5-0.2 5-3V55h17c2.8 0 3-2.2 3-5S99.8 45 97 45zM35 25H5c-2.8 0-5 2.2-5 5s2.2 5 5 5h30c2.8 0 5-2.2 5-5S37.8 25 35 25z" })
+				);
+			case "cart":
+				return (0, _mithril2.default)(
+					"svg",
+					_extends({}, vnode.attrs, { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 100 90" }),
+					(0, _mithril2.default)("path", { d: "M43.5 72.8c-2.6 0-4.7 2.1-4.7 4.8 0 2.6 2.1 4.8 4.8 4.8s4.8-2.1 4.8-4.7C48.3 74.9 46.1 72.8 43.5 72.8zM72.3 72.8c-2.6 0-4.7 2.1-4.7 4.8 0 2.6 2.1 4.8 4.8 4.8s4.8-2.1 4.8-4.7C77.1 74.9 75 72.8 72.3 72.8zM29.5 29.5l-3.8-11.7H5.4l2 7h13.2l14.3 43.6H81.4l13.3-38.9H29.5z" })
+				);
+			default:
+				return "";
+		}
+	}
+};
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _mithril = __webpack_require__(0);
+
+var _mithril2 = _interopRequireDefault(_mithril);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Analytics = {
+    view: function view(vnode) {
+        return (0, _mithril2.default)(
+            "section",
+            { "class": "" },
+            (0, _mithril2.default)(
+                "table",
+                { "class": "f6 w-100  center ba b--black-20 bg-white", cellspacing: "0" },
+                (0, _mithril2.default)(
+                    "thead",
+                    { "class": "tc" },
+                    (0, _mithril2.default)(
+                        "tr",
+                        { "class": "bg-near-white" },
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "S/N"
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Name"
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Reg. No."
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Vehicle No."
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Form No."
+                        ),
+                        (0, _mithril2.default)(
+                            "th",
+                            { "class": "fw6 bb b--black-20  pa3 " },
+                            "Actions"
+                        )
+                    )
+                ),
+                (0, _mithril2.default)(
+                    "tbody",
+                    { "class": "lh-copy" },
+                    (0, _mithril2.default)(
+                        "tr",
+                        null,
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" }),
+                        (0, _mithril2.default)("td", { "class": "pv3 pr3 bb b--black-20" })
+                    )
+                )
+            )
+        );
+    }
+};
+
+exports.default = Analytics;
 
 /***/ })
 /******/ ]);

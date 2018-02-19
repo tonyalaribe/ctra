@@ -23,7 +23,8 @@ export var ViewItem = {
 			Nationality: vo_data.Nationality,
 			"Name of NOK": vo_data.NOK,
 			"Relationship with NOK": vo_data.RelationshipWithNextOfKin,
-			"Phone Number of NOK": vo_data.PhoneNumberOfNextOfKin
+			"Phone Number of NOK": vo_data.PhoneNumberOfNextOfKin,
+			Passport: vo_data.OwnersPassport
 		};
 
 		let drivers_data = Data.item.DriversBio;
@@ -42,7 +43,9 @@ export var ViewItem = {
 			Nationality: drivers_data.Nationality,
 			"Name of NOK": drivers_data.NOK,
 			"Relationship with NOK": drivers_data.RelationshipWithNextOfKin,
-			"Phone Number of NOK": drivers_data.PhoneNumberOfNextOfKin
+			"Phone Number of NOK": drivers_data.PhoneNumberOfNextOfKin,
+			Photograph: drivers_data.DriversPhotograph,
+			Thumbprint: drivers_data.DriversThumbprint
 		};
 
 		let v_data = Data.item.VehicleDetails;
@@ -52,7 +55,8 @@ export var ViewItem = {
 			"Vehicle License Number": v_data.VehicleLicenseNumber,
 			"Chasis Number": v_data.ChasisNumber,
 			"Engine Number": v_data.EngineNumber,
-			"Insurance Number": v_data.InsuranceNumber
+			"Insurance Number": v_data.InsuranceNumber,
+			Photograph: v_data.PhotographOfVehicle
 		};
 
 		let g_data = Data.item.GuarantorsBio;
@@ -66,7 +70,9 @@ export var ViewItem = {
 			"L.G.A. of Origin": g_data.LocalGovernmentOfOrigin,
 			"State of Origin": g_data.StateOfOrigin,
 			Nationality: g_data.Nationality,
-			Religion: g_data.Religion
+			Religion: g_data.Religion,
+			Passport: g_data.GuarantorsPassport,
+			Identity: g_data.GuarantorsIdentity
 		};
 
 		console.log(Object.entries(VehicleOwnersBio).forEach(([k, v]) => v));
@@ -86,7 +92,7 @@ export var ViewItem = {
 											<img
 												src={
 													Data.item.VehicleOwnersBio.OwnersPassport
-														? Data.item.VehicleOwnersBio.OwnersPassport
+														? "/assets/img/uploads/"+Data.item.VehicleOwnersBio.OwnersPassport
 														: "//placehold.it/200x200"
 												}
 												class="w-100 bg-light-gray db h4"
@@ -122,7 +128,7 @@ export var ViewItem = {
 											<img
 												src={
 													Data.item.DriversBio.DriversPhotograph
-														? Data.item.DriversBio.DriversPhotograph
+														? "/assets/img/uploads/"+Data.item.DriversBio.DriversPhotograph
 														: "//placehold.it/200x200"
 												}
 												class="w-100 bg-light-gray db"
@@ -137,7 +143,7 @@ export var ViewItem = {
 											<img
 												src={
 													Data.item.DriversBio.DriversThumbprint
-														? Data.item.DriversBio.DriversThumbprint
+														? "/assets/img/uploads/"+Data.item.DriversBio.DriversThumbprint
 														: "//placehold.it/200x200"
 												}
 												class="w-100 bg-light-gray db h4"
@@ -175,7 +181,7 @@ export var ViewItem = {
 											<img
 												src={
 													Data.item.VehicleDetails.PhotographOfVehicle
-														? Data.item.VehicleDetails.PhotographOfVehicle
+														? "/assets/img/uploads/"+Data.item.VehicleDetails.PhotographOfVehicle
 														: "//placehold.it/200x200"
 												}
 												class="w-100 bg-light-gray db h4"
@@ -211,7 +217,7 @@ export var ViewItem = {
 											<img
 												src={
 													Data.item.GuarantorsBio.GuarantorsPassport
-														? Data.item.GuarantorsBio.GuarantorsPassport
+														? "/assets/img/uploads/"+Data.item.GuarantorsBio.GuarantorsPassport
 														: "//placehold.it/200x200"
 												}
 												class="w-100 bg-light-gray db"
@@ -226,7 +232,7 @@ export var ViewItem = {
 											<img
 												src={
 													Data.item.GuarantorsBio.GuarantorsIdentity
-														? Data.item.GuarantorsBio.GuarantorsIdentity
+														? "/assets/img/uploads/"+Data.item.GuarantorsBio.GuarantorsIdentity
 														: "//placehold.it/200x200"
 												}
 												class="w-100 bg-light-gray db h4"

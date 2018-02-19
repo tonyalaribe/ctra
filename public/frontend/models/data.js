@@ -26,7 +26,7 @@ export var Data = {
 	},
 	Submit: function() {
 		console.log(Data.data);
-		console.log(JSON.stringify(Data.data));
+		// console.log(JSON.stringify(Data.data));
 
 		return m
 			.request({

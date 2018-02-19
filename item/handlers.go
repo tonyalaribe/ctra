@@ -105,31 +105,37 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, messages.ErrInternalServer)
 		return
 	}
-
+	log.Println("MetaData.FormNumber: ", item.MetaData.FormNumber, " MetaData.SlotNumber: ", item.MetaData.SlotNumber)
 	// check if each field is not empty...
 	if item.MetaData.FormNumber == "" || item.MetaData.SlotNumber == "" {
 		render.Status(r, 401)
 		render.JSON(w, r, messages.ErrBadToken)
 		return
 	}
+	log.Println("owner firstname: ", item.VehicleOwnersBio.FirstName, " Owner Lastname: ", item.VehicleOwnersBio.LastName, "owners phonenumbers: ", item.VehicleOwnersBio.PhoneNumbers)
 	if item.VehicleOwnersBio.OwnersPassport == "" || item.VehicleOwnersBio.FirstName == "" ||
 		item.VehicleOwnersBio.LastName == "" || item.VehicleOwnersBio.PhoneNumbers == "" {
 		render.Status(r, 401)
 		render.JSON(w, r, messages.ErrBadToken)
 		return
 	}
+	log.Println("Drivers firstname: ", item.DriversBio.FirstName, "drivers lastname: ", item.DriversBio.LastName, "phonenumber: ", item.DriversBio.PhoneNumbers)
 	if item.DriversBio.FirstName == "" || item.DriversBio.LastName == "" ||
 		item.DriversBio.DriversPhotograph == "" || item.DriversBio.PhoneNumbers == "" {
 		render.Status(r, 401)
 		render.JSON(w, r, messages.ErrBadToken)
 		return
 	}
+	log.Println("Guarantor: firstname:", item.GuarantorsBio.FirstName, "lastname: ", item.GuarantorsBio.LastName, "Phonenuber:", item.GuarantorsBio.PhoneNumbers)
 	if item.GuarantorsBio.FirstName == "" || item.GuarantorsBio.LastName == "" ||
 		item.GuarantorsBio.PhoneNumbers == "" || item.GuarantorsBio.GuarantorsPassport == "" {
 		render.Status(r, 401)
 		render.JSON(w, r, messages.ErrBadToken)
 		return
 	}
+	log.Println("regnum:", item.VehicleDetails.RegistrationNumber, "typeofvehicle:", item.VehicleDetails.TypeOfVehicle, "license number: ",
+		item.VehicleDetails.VehicleLicenseNumber, "chasis: ", item.VehicleDetails.ChasisNumber, "enginenumber:",
+		item.VehicleDetails.EngineNumber, "insurancenumber", item.VehicleDetails.InsuranceNumber)
 	if item.VehicleDetails.RegistrationNumber == "" || item.VehicleDetails.TypeOfVehicle == "" ||
 		item.VehicleDetails.VehicleLicenseNumber == "" || item.VehicleDetails.ChasisNumber == "" ||
 		item.VehicleDetails.EngineNumber == "" || item.VehicleDetails.InsuranceNumber == "" ||
@@ -161,6 +167,44 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	// }
 	//
 	// png.Encode(f, im)
+
+	// upload each file
+	item.VehicleOwnersBio.OwnersPassport, err = UploadImage(item.VehicleOwnersBio.OwnersPassport)
+	if err != nil {
+		render.Status(r, 401)
+		render.JSON(w, r, err.Error())
+		return
+	}
+	item.DriversBio.DriversPhotograph, err = UploadImage(item.DriversBio.DriversPhotograph)
+	if err != nil {
+		render.Status(r, 401)
+		render.JSON(w, r, err.Error())
+		return
+	}
+	item.DriversBio.DriversThumbprint, err = UploadImage(item.DriversBio.DriversThumbprint)
+	if err != nil {
+		render.Status(r, 401)
+		render.JSON(w, r, err.Error())
+		return
+	}
+	item.GuarantorsBio.GuarantorsPassport, err = UploadImage(item.GuarantorsBio.GuarantorsPassport)
+	if err != nil {
+		render.Status(r, 401)
+		render.JSON(w, r, err.Error())
+		return
+	}
+	item.GuarantorsBio.GuarantorsIdentity, err = UploadImage(item.GuarantorsBio.GuarantorsIdentity)
+	if err != nil {
+		render.Status(r, 401)
+		render.JSON(w, r, err.Error())
+		return
+	}
+	item.VehicleDetails.PhotographOfVehicle, err = UploadImage(item.VehicleDetails.PhotographOfVehicle)
+	if err != nil {
+		render.Status(r, 401)
+		render.JSON(w, r, err.Error())
+		return
+	}
 
 	conf := config.Get()
 	err = conf.Storm.Save(&item)
