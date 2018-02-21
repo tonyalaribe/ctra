@@ -9,7 +9,7 @@ import {Analytics} from "./containers/analytics";
 
 var root = document.getElementById("appContainer");
 
-m.route.prefix("#!");
+m.route.prefix("");
 
 m.route(root, "/", {
 	"/": {

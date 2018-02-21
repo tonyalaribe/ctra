@@ -4829,7 +4829,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var root = document.getElementById("appContainer");
 
-_mithril2.default.route.prefix("#!");
+_mithril2.default.route.prefix("");
 
 _mithril2.default.route(root, "/", {
 	"/": {

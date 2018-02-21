@@ -50,6 +50,9 @@ func Routes() *chi.Mux {
 
 	router.Mount("/api/items", item.Routes())
 
+	router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./public/index.html")
+	})
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./public/index.html")
 	})
