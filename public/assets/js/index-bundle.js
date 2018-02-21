@@ -6776,7 +6776,7 @@ var Shell = exports.Shell = {
 						),
 						(0, _mithril2.default)(
 							"form",
-							{ "class": "dib pl3 w5 relative" },
+							{ action: "#!", "class": "dib pl3 w5 relative" },
 							(0, _mithril2.default)("input", {
 								type: "text",
 								"class": "bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib",
@@ -6785,11 +6785,15 @@ var Shell = exports.Shell = {
 								oninput: _mithril2.default.withAttr("value", function (value) {
 									_data.Data.searchquery = value;
 								})
+								// onkeypress={(e)=>{
+								// 	console.log("pressed: ", e);
+								// }}
 							}),
 							(0, _mithril2.default)(
-								"p",
-								{ "class": "mv0 dib w1 h1 absolute pointer", style: "top: 0.5rem; right:0.5rem",
-									onclick: function onclick() {
+								"button",
+								{ type: "submit", "class": "ba b--transparent bg-white mv0 dib w1 h1 absolute pointer pa0", style: "top: 0.5rem; right:0.5rem",
+									onclick: function onclick(e) {
+										e.preventDefault();
 										console.log("Search button clicked");
 										if (!_data.Data.searchquery) {
 											_izitoast2.default.error({

@@ -26,7 +26,7 @@ export var Shell = {
 						</a>
 						<div class="dib pl4">
 							<span class=" dib ph2 pv2 ">search:</span>
-							<form class="dib pl3 w5 relative">
+							<form action="#!" class="dib pl3 w5 relative">
 								<input
 									type="text"
 									class="bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib"
@@ -35,9 +35,13 @@ export var Shell = {
 									oninput={m.withAttr("value", function(value){
 										Data.searchquery = value;
 									})}
+									// onkeypress={(e)=>{
+									// 	console.log("pressed: ", e);
+									// }}
 								/>
-								<p class="mv0 dib w1 h1 absolute pointer" style="top: 0.5rem; right:0.5rem"
-								onclick={() => {
+								<button type="submit" class="ba b--transparent bg-white mv0 dib w1 h1 absolute pointer pa0" style="top: 0.5rem; right:0.5rem"
+								onclick={(e) => {
+									e.preventDefault()
 									console.log("Search button clicked")
 									if (!Data.searchquery) {
 										izitoast.error({
@@ -64,7 +68,7 @@ export var Shell = {
 									})
 								}}>
 									<SVGIcons type="search"/>
-								</p>
+								</button>
 							</form>
 						</div>
 						<div class="dib fr pv2">
