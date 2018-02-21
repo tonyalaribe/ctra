@@ -2,6 +2,7 @@ import m from "mithril";
 import flatpickr from "flatpickr";
 import {SVGIcons} from "../../shared/components/svgIcons";
 import {Data} from "../models/data";
+import izitoast from "izitoast";
 
 export var Shell = {
 	oncreate: function() {
@@ -38,9 +39,26 @@ export var Shell = {
 								<p class="mv0 dib w1 h1 absolute pointer" style="top: 0.5rem; right:0.5rem"
 								onclick={() => {
 									console.log("Search button clicked")
+									if (!Data.searchquery) {
+										izitoast.error({
+											title: "Error",
+											message: "No word to search",
+											position: "topCenter"
+										})
+										return
+									}
 									Data.Search()
 									.then(function(resp){
 										console.log(resp);
+										if (resp.length) {
+											Data.items = resp;
+										} else {
+											izitoast.error({
+												title: "Error",
+												message: "No Result found",
+												position: "topCenter"
+											})
+										}
 									}).catch(function(err){
 										console.log(err);
 									})

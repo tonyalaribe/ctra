@@ -280,14 +280,15 @@ func Search(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, messages.ErrInternalServer)
 		return
 	}
-	log.Println(searchResult.Hits)
+	log.Println(searchResult)
 	if len(searchResult.Hits) > 0 {
 		for _, v := range searchResult.Hits {
 			log.Println(v.ID)
 			item := Item{}
-			err = conf.Storm.One("ID", v.ID, &item)
-			if err != nil {
-				log.Println(err)
+			id, _ := strconv.Atoi(v.ID)
+			Oneerr := conf.Storm.One("ID", id, &item)
+			if Oneerr != nil {
+				log.Println(Oneerr)
 				continue
 			}
 			items = append(items, item)

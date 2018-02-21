@@ -20,7 +20,7 @@ export var Data = {
 	searchquery:"",
 	Search: function(){
 		return m.request({
-			url:"api/items/search"+Data.searchquery,
+			url:"api/items/search/"+Data.searchquery,
 			method: "GET",
 		})
 	},
