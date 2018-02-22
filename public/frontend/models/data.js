@@ -9,6 +9,8 @@ export var Data = {
 		GuarantorsBio: {},
 		VehicleDetails: {}
 	},
+	PerPage: 2,
+	Page: 1,
 	items: [],
 	item: {
 		MetaData: {},
@@ -17,6 +19,7 @@ export var Data = {
 		GuarantorsBio: {},
 		VehicleDetails: {}
 	},
+	count: 0,
 	searchquery:"",
 	searchdate: {},
 	Search: function(){
@@ -41,6 +44,12 @@ export var Data = {
 			data: Data.searchdate
 		})
 	},
+	GetCount: function(){
+		return m.request({
+			method: "GET",
+			url: "/api/items/count",
+		})
+	},
 	Submit: function() {
 		console.log(Data.data);
 		// console.log(JSON.stringify(Data.data));
@@ -60,11 +69,11 @@ export var Data = {
 			});
 	},
 	GetAll: function() {
-		console.log("get all");
+		// console.log("get all");
 		return m
 			.request({
 				method: "GET",
-				url: "/api/items/all"
+				url: "/api/items/all?page="+Data.Page
 			})
 			.then(function(result) {
 				console.log(result);

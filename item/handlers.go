@@ -95,6 +95,8 @@ type Item struct {
 	} `json:"VehicleDetails"`
 }
 
+var PerPage int = 2
+
 func Create(w http.ResponseWriter, r *http.Request) {
 	item := Item{}
 
@@ -220,9 +222,18 @@ func Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
+	skip := 0
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil {
+		log.Println(err)
+		page = 1
+	}
+	if page > 1 {
+		skip = PerPage * (page - 1)
+	}
 	items := []Item{}
 	conf := config.Get()
-	err := conf.Storm.AllByIndex("ModifiedAt", &items, storm.Limit(10), storm.Reverse())
+	err = conf.Storm.AllByIndex("ModifiedAt", &items, storm.Limit(PerPage), storm.Skip(skip), storm.Reverse())
 	// err := conf.Storm.All(&items)
 	if err != nil {
 		log.Println(err)
@@ -232,6 +243,17 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, items)
+}
+
+func CountItems(w http.ResponseWriter, r *http.Request) {
+	conf := config.Get()
+	// count := 0
+	count, err := conf.Storm.Count(&Item{})
+	if err != nil {
+		log.Println(err)
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, count)
 }
 
 func GetOne(w http.ResponseWriter, r *http.Request) {

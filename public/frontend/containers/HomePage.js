@@ -1,10 +1,17 @@
 import m from "mithril";
 import flatpickr from "flatpickr";
 import { Data } from "../models/data.js";
+import {SVGIcons} from "../../shared/components/svgIcons";
 
 export var HomePage = {
 	oncreate: function() {
-		Data.GetAll();
+		Data.GetCount().then(function(resp){
+			resp = resp/Data.PerPage;
+			Data.count = Array(resp).fill(0, 0, resp);
+			Data.GetAll();
+		}).catch(function(err) {
+			console.log(err);
+		});
 		flatpickr(document.getElementById("fromDate"), {});
 		flatpickr(document.getElementById("toDate"), {});
 	},
@@ -12,7 +19,7 @@ export var HomePage = {
 		return (
 			<section class="tc ph6 pb5 " style="min-height:90vh">
 				<div class="bg-gray cf pa3">
-					<button class="fr pv2 ph3 bg-white shadow-4 ">Refresh List</button>
+					<button class="fr pv2 ph3 bg-white shadow-4 ba b--transparent pointer">Refresh List</button>
 				</div>
 				<table class="f6 w-100  center ba b--black-20 bg-white" cellspacing="0">
 					<thead class="tc">
@@ -56,6 +63,33 @@ export var HomePage = {
 						})}
 					</tbody>
 				</table>
+				{Data.count.length?
+
+				<div class="">
+					<p class="dib w2 pa1 br3 br--left ba white bg-green pointer"onclick={()=> {
+						console.log("previous clicked", Data.count);
+						if ((Data.Page - 1) > 0){
+							--Data.Page;
+							Data.GetAll();
+						}
+					}}>‹</p>
+					{Data.count.map(function(v,i){
+						return (
+							<p class={(Data.Page == i+1?"bg-white green ":"white bg-green ")+" dib w2 pa1 ba pointer"}
+							onclick={()=> {
+								Data.Page = i+1
+								Data.GetAll();
+							}}>{i+1}</p>
+						)
+					})}
+					<p class="dib w2 pa1 br3 br--right ba white bg-green pointer"onclick={()=> {
+						console.log("Next clicked");
+						if ((Data.Page + 1) <= Data.count.length){
+							++Data.Page;
+							Data.GetAll();
+						}
+					}}>›</p>
+				</div>:""}
 			</section>
 		);
 	}

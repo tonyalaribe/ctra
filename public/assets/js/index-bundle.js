@@ -1356,6 +1356,8 @@ var Data = exports.Data = {
 		GuarantorsBio: {},
 		VehicleDetails: {}
 	},
+	PerPage: 2,
+	Page: 1,
 	items: [],
 	item: {
 		MetaData: {},
@@ -1364,6 +1366,7 @@ var Data = exports.Data = {
 		GuarantorsBio: {},
 		VehicleDetails: {}
 	},
+	count: 0,
 	searchquery: "",
 	searchdate: {},
 	Search: function Search() {
@@ -1388,6 +1391,12 @@ var Data = exports.Data = {
 			data: Data.searchdate
 		});
 	},
+	GetCount: function GetCount() {
+		return _mithril2.default.request({
+			method: "GET",
+			url: "/api/items/count"
+		});
+	},
 	Submit: function Submit() {
 		console.log(Data.data);
 		// console.log(JSON.stringify(Data.data));
@@ -1405,10 +1414,10 @@ var Data = exports.Data = {
 		});
 	},
 	GetAll: function GetAll() {
-		console.log("get all");
+		// console.log("get all");
 		return _mithril2.default.request({
 			method: "GET",
-			url: "/api/items/all"
+			url: "/api/items/all?page=" + Data.Page
 		}).then(function (result) {
 			console.log(result);
 			Data.items = result;
@@ -5343,11 +5352,19 @@ var _flatpickr2 = _interopRequireDefault(_flatpickr);
 
 var _data = __webpack_require__(1);
 
+var _svgIcons = __webpack_require__(21);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var HomePage = exports.HomePage = {
 	oncreate: function oncreate() {
-		_data.Data.GetAll();
+		_data.Data.GetCount().then(function (resp) {
+			resp = resp / _data.Data.PerPage;
+			_data.Data.count = Array(resp).fill(0, 0, resp);
+			_data.Data.GetAll();
+		}).catch(function (err) {
+			console.log(err);
+		});
 		(0, _flatpickr2.default)(document.getElementById("fromDate"), {});
 		(0, _flatpickr2.default)(document.getElementById("toDate"), {});
 	},
@@ -5360,7 +5377,7 @@ var HomePage = exports.HomePage = {
 				{ "class": "bg-gray cf pa3" },
 				(0, _mithril2.default)(
 					"button",
-					{ "class": "fr pv2 ph3 bg-white shadow-4 " },
+					{ "class": "fr pv2 ph3 bg-white shadow-4 ba b--transparent pointer" },
 					"Refresh List"
 				)
 			),
@@ -5453,7 +5470,44 @@ var HomePage = exports.HomePage = {
 						);
 					})
 				)
-			)
+			),
+			_data.Data.count.length ? (0, _mithril2.default)(
+				"div",
+				{ "class": "" },
+				(0, _mithril2.default)(
+					"p",
+					{ "class": "dib w2 pa1 br3 br--left ba white bg-green pointer", onclick: function onclick() {
+							console.log("previous clicked", _data.Data.count);
+							if (_data.Data.Page - 1 > 0) {
+								--_data.Data.Page;
+								_data.Data.GetAll();
+							}
+						} },
+					"\u2039"
+				),
+				_data.Data.count.map(function (v, i) {
+					return (0, _mithril2.default)(
+						"p",
+						{ "class": (_data.Data.Page == i + 1 ? "bg-white green " : "white bg-green ") + " dib w2 pa1 ba pointer",
+							onclick: function onclick() {
+								_data.Data.Page = i + 1;
+								_data.Data.GetAll();
+							} },
+						i + 1
+					);
+				}),
+				(0, _mithril2.default)(
+					"p",
+					{ "class": "dib w2 pa1 br3 br--right ba white bg-green pointer", onclick: function onclick() {
+							console.log("Next clicked");
+							if (_data.Data.Page + 1 <= _data.Data.count.length) {
+								++_data.Data.Page;
+								_data.Data.GetAll();
+							}
+						} },
+					"\u203A"
+				)
+			) : ""
 		);
 	}
 };
