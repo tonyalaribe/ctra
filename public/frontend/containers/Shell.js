@@ -32,6 +32,7 @@ export var Shell = {
 									class="bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib"
 									placeholder="form number, name, slot number, etc"
 									style="outline: none"
+									value={Data.searchquery}
 									oninput={m.withAttr("value", function(value){
 										Data.searchquery = value;
 									})}
@@ -55,6 +56,9 @@ export var Shell = {
 									.then(function(resp){
 										console.log(resp);
 										if (resp.length) {
+											if (m.route.get() != "/"){
+												m.route.set("/");
+											}
 											Data.items = resp;
 										} else {
 											izitoast.error({
@@ -92,6 +96,9 @@ export var Shell = {
 								type="text"
 								id="fromDate"
 								class="pv2 ph3 br2 bw1 ba b--gray dib "
+								oninput={m.withAttr("value", function(value){
+									Data.searchdate.From = value;
+								})}
 							/>
 						</div>
 
@@ -101,14 +108,31 @@ export var Shell = {
 								type="text"
 								id="toDate"
 								class="pv2 ph3 br2 bw1 ba b--gray dib "
+								oninput={m.withAttr("value", function(value){
+									Data.searchdate.To = value;
+								})}
 							/>
 						</div>
 
 						<div class="dib ml3">
-							<button class="bw0  shadow-4 pv2 ph3  br2 pointer grow ma2">
+							<button class="bw0  shadow-4 pv2 ph3  br2 pointer grow ma2"
+							onclick={function() {
+								console.log(Data.searchdate);
+								Data.SearchByDate().then(function(resp){
+									console.log(resp);
+									Data.items = resp;
+								}).catch(function(err){
+									console.log(err);
+								})
+							}}>
 								Search
 							</button>
-							<button class="bw0 shadow-4 pv2 ph3  br2  pointer grow ma2">
+							<button class="bw0 shadow-4 pv2 ph3  br2  pointer grow ma2"
+							onclick={() => {
+								Data.searchdate = {}
+								document.getElementById("toDate").value = "";
+								document.getElementById("fromDate").value = "";
+							}}>
 								Clear
 							</button>
 						</div>

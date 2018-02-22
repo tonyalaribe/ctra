@@ -304,3 +304,30 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, items)
 }
+
+func SearchByDates(w http.ResponseWriter, r *http.Request) {
+	query := struct {
+		From time.Time
+		To   time.Time
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&query)
+	if err != nil {
+		log.Println(err)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, messages.ErrInternalServer)
+		return
+	}
+	var items = []Item{}
+	conf := config.Get()
+	err = conf.Storm.Range("CreatedAt", query.From, query.To, &items)
+	// err := conf.Storm.All(&items)
+	if err != nil && err.Error() != "not found" {
+		log.Println(err)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, messages.ErrInternalServer)
+		return
+	}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, items)
+}

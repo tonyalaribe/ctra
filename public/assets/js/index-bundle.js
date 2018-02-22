@@ -1365,10 +1365,27 @@ var Data = exports.Data = {
 		VehicleDetails: {}
 	},
 	searchquery: "",
+	searchdate: {},
 	Search: function Search() {
 		return _mithril2.default.request({
-			url: "api/items/search/" + Data.searchquery,
+			url: "/api/items/search/" + Data.searchquery,
 			method: "GET"
+		});
+	},
+	SearchByDate: function SearchByDate() {
+		if (!Data.searchdate.To || !Data.searchdate.To) {
+			return _izitoast2.default.error({
+				title: "Error",
+				message: "Please fill out all search fields.",
+				position: "topCenter"
+			});
+		}
+		Data.searchdate.From = new Date(Data.searchdate.From);
+		Data.searchdate.To = new Date(Data.searchdate.To);
+		return _mithril2.default.request({
+			method: "POST",
+			url: "/api/items/search/bydate",
+			data: Data.searchdate
 		});
 	},
 	Submit: function Submit() {
@@ -6782,6 +6799,7 @@ var Shell = exports.Shell = {
 								"class": "bg-white br4 bw0 pv2 pl3 pr4 w-100 f6 dib",
 								placeholder: "form number, name, slot number, etc",
 								style: "outline: none",
+								value: _data.Data.searchquery,
 								oninput: _mithril2.default.withAttr("value", function (value) {
 									_data.Data.searchquery = value;
 								})
@@ -6806,6 +6824,9 @@ var Shell = exports.Shell = {
 										_data.Data.Search().then(function (resp) {
 											console.log(resp);
 											if (resp.length) {
+												if (_mithril2.default.route.get() != "/") {
+													_mithril2.default.route.set("/");
+												}
 												_data.Data.items = resp;
 											} else {
 												_izitoast2.default.error({
@@ -6856,7 +6877,10 @@ var Shell = exports.Shell = {
 						(0, _mithril2.default)("input", {
 							type: "text",
 							id: "fromDate",
-							"class": "pv2 ph3 br2 bw1 ba b--gray dib "
+							"class": "pv2 ph3 br2 bw1 ba b--gray dib ",
+							oninput: _mithril2.default.withAttr("value", function (value) {
+								_data.Data.searchdate.From = value;
+							})
 						})
 					),
 					(0, _mithril2.default)(
@@ -6870,7 +6894,10 @@ var Shell = exports.Shell = {
 						(0, _mithril2.default)("input", {
 							type: "text",
 							id: "toDate",
-							"class": "pv2 ph3 br2 bw1 ba b--gray dib "
+							"class": "pv2 ph3 br2 bw1 ba b--gray dib ",
+							oninput: _mithril2.default.withAttr("value", function (value) {
+								_data.Data.searchdate.To = value;
+							})
 						})
 					),
 					(0, _mithril2.default)(
@@ -6878,12 +6905,26 @@ var Shell = exports.Shell = {
 						{ "class": "dib ml3" },
 						(0, _mithril2.default)(
 							"button",
-							{ "class": "bw0  shadow-4 pv2 ph3  br2 pointer grow ma2" },
+							{ "class": "bw0  shadow-4 pv2 ph3  br2 pointer grow ma2",
+								onclick: function onclick() {
+									console.log(_data.Data.searchdate);
+									_data.Data.SearchByDate().then(function (resp) {
+										console.log(resp);
+										_data.Data.items = resp;
+									}).catch(function (err) {
+										console.log(err);
+									});
+								} },
 							"Search"
 						),
 						(0, _mithril2.default)(
 							"button",
-							{ "class": "bw0 shadow-4 pv2 ph3  br2  pointer grow ma2" },
+							{ "class": "bw0 shadow-4 pv2 ph3  br2  pointer grow ma2",
+								onclick: function onclick() {
+									_data.Data.searchdate = {};
+									document.getElementById("toDate").value = "";
+									document.getElementById("fromDate").value = "";
+								} },
 							"Clear"
 						)
 					)

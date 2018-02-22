@@ -18,10 +18,27 @@ export var Data = {
 		VehicleDetails: {}
 	},
 	searchquery:"",
+	searchdate: {},
 	Search: function(){
 		return m.request({
-			url:"api/items/search/"+Data.searchquery,
+			url:"/api/items/search/"+Data.searchquery,
 			method: "GET",
+		})
+	},
+	SearchByDate: function() {
+		if (!Data.searchdate.To || !Data.searchdate.To) {
+			return izitoast.error({
+				title: "Error",
+				message: "Please fill out all search fields.",
+				position: "topCenter"
+			})
+		}
+		Data.searchdate.From = new Date(Data.searchdate.From)
+		Data.searchdate.To = new Date(Data.searchdate.To)
+		return m.request({
+			method: "POST",
+			url: "/api/items/search/bydate",
+			data: Data.searchdate
 		})
 	},
 	Submit: function() {
