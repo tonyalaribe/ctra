@@ -12,7 +12,7 @@ export var VehicleDetails = {
 					<div class="tc dib w-100">
 						<ImageInput
 							label="Vehicle's Photograph"
-							class=" dib w-50 "
+							class=" dib w-50-ns w-100 "
 							Value={Data.data.VehicleDetails.PhotographOfVehicle}
 							Callback={v => (Data.data.VehicleDetails.PhotographOfVehicle = v)}
 						/>

@@ -25,11 +25,11 @@ var Analytics = {
     },
     view: function(vnode) {
         return (
-            <section class="ph4">
+            <section class="ph4-l ph2">
                 <div class="ph5-ns">
-                    <h1 class="black-80 tl">TOTAL REGISTERED: <span class="blue">{Data.count}</span></h1>
-                    <h1 class="black-80 tl">TOTAL REGISTERED (WEEK): <span class="blue" id="weekcount"></span></h1>
-                    <h1 class="black-80 tl">TOTAL REGISTERED (TODAY): <span class="blue" id="todaycount"></span></h1>
+                    <p class="black-80 tl f3-ns f4 b">TOTAL REGISTERED: <span class="blue">{Data.count}</span></p>
+                    <p class="black-80 tl f3-ns f4 b">TOTAL REGISTERED (WEEK): <span class="blue" id="weekcount"></span></p>
+                    <p class="black-80 tl f3-ns f4 b">TOTAL REGISTERED (TODAY): <span class="blue" id="todaycount"></span></p>
                 </div>
                 <div class="ph5-ns">
                     <div class="ct-chart ct-golden-section" id="chart2"></div>

@@ -13,7 +13,7 @@ export var Shell = {
 		return (
 			<section class="bg-near-white  f6 fw3 navy">
 				<div class="bg-dark-blue white-80 shadow-4 fixed w-100 z-3">
-					<div class="ph5 pa3 cf">
+					<div class="ph5-l ph3-m ph1 pa3 cf">
 						<a class="link dib ph2 pv2 " oncreate={m.route.link} href="/">
 							home
 						</a>
@@ -24,8 +24,16 @@ export var Shell = {
 						>
 							analytics
 						</a>
-						<div class="dib pl4">
-							<span class=" dib ph2 pv2 ">search:</span>
+						<a
+							class="bw0 bg-dark-red shadow-4 pv2 ph3 fr br2 white-90 pointer grow link dn-ns"
+							style="background-color:#5889FF"
+							oncreate={m.route.link}
+							href="/registration"
+						>
+							New Registration
+						</a>
+						<div class="dib pl4-l pl2 mt2 mt0-ns">
+							<span class="dib pv2">search:</span>
 							<form action="#!" class="dib pl3 w5 relative">
 								<input
 									type="text"
@@ -75,7 +83,7 @@ export var Shell = {
 								</button>
 							</form>
 						</div>
-						<div class="dib fr pv2">
+						<div class="dib-ns dn fr pv2 ">
 							<a
 								class="bw0 bg-dark-red shadow-4 pv2 ph3  br2 white-90 pointer grow link"
 								style="background-color:#5889FF"
@@ -87,9 +95,9 @@ export var Shell = {
 						</div>
 					</div>
 				</div>
-				<section class="pa4 tc ">
+				<section class="pt4 pb4-ns pb1 ph4-ns ph1 tc ">
 					<div class="pv4" />
-					<div class="dib bb b--gray pa2 pb3">
+					<div class="dib bb b--gray pa3 pb3">
 						<div class="dib pr3">
 							<span class="dib pr2">From: </span>
 							<input

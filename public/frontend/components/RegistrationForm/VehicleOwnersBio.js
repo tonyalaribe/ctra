@@ -13,7 +13,7 @@ export var VehicleOwnersBio = {
 					<div class="tc dib w-100">
 						<ImageInput
 							label="Owners Passport"
-							class=" dib w-50 "
+							class=" dib w-50-ns w-100 "
 							Value={Data.data.VehicleOwnersBio.OwnersPassport}
 							Callback={v => (Data.data.VehicleOwnersBio.OwnersPassport = v)}
 						/>

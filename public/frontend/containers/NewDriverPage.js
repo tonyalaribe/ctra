@@ -72,10 +72,10 @@ export var NewDriverPage = {
 	},
 	view: function() {
 		return (
-			<section class="tc ph6 ">
+			<section class="tc ph6-l ph3-m ph1">
 				<div class="bg-gray cf pa3">
 					<button
-						class="fr pv2 ph3 bg-white shadow-4 "
+						class="fr pv2 ph3 bg-white shadow-4 ba b--transparent"
 						onclick={NewDriverPage.ValidateSubmit}
 					>
 						Save
@@ -86,7 +86,7 @@ export var NewDriverPage = {
 				</section>
 				<div class="bg-gray cf pa3">
 					<button
-						class="fr pv2 ph3 bg-white shadow-4 "
+						class="fr pv2 ph3 bg-white shadow-4 ba b--transparent"
 						onclick={NewDriverPage.ValidateSubmit}
 					>Save</button>
 				</div>

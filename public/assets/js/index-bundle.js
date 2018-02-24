@@ -5956,7 +5956,7 @@ var HomePage = exports.HomePage = {
 	view: function view() {
 		return (0, _mithril2.default)(
 			"section",
-			{ "class": "tc ph6 pb5 ", style: "min-height:90vh" },
+			{ "class": "tc ph6-l ph3-m ph1 pb5 ", style: "min-height:90vh" },
 			(0, _mithril2.default)(
 				"div",
 				{ "class": "bg-gray cf pa3" },
@@ -5967,93 +5967,97 @@ var HomePage = exports.HomePage = {
 				)
 			),
 			(0, _mithril2.default)(
-				"table",
-				{ "class": "f6 w-100  center ba b--black-20 bg-white", cellspacing: "0" },
+				"div",
+				{ "class": "overflow-auto" },
 				(0, _mithril2.default)(
-					"thead",
-					{ "class": "tc" },
+					"table",
+					{ "class": "f6 w-100 center ba b--black-20 bg-white", cellspacing: "0" },
 					(0, _mithril2.default)(
-						"tr",
-						{ "class": "bg-near-white" },
+						"thead",
+						{ "class": "tc" },
 						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"S/N"
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Name"
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Reg. No."
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Vehicle No."
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Form No."
-						),
-						(0, _mithril2.default)(
-							"th",
-							{ "class": "fw6 bb b--black-20  pa3 " },
-							"Actions"
-						)
-					)
-				),
-				(0, _mithril2.default)(
-					"tbody",
-					{ "class": "lh-copy" },
-					_data.Data.items.map(function (item) {
-						return (0, _mithril2.default)(
 							"tr",
-							null,
+							{ "class": "bg-near-white" },
 							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.ID
+								"th",
+								{ "class": "fw6 bb b--black-20  pa3 " },
+								"S/N"
 							),
 							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.DriversBio.FirstName + " " + item.DriversBio.LastName
+								"th",
+								{ "class": "fw6 bb b--black-20  pa3 " },
+								"Name"
 							),
 							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.VehicleDetails.RegistrationNumber
+								"th",
+								{ "class": "fw6 bb b--black-20  pa3 " },
+								"Reg. No."
 							),
 							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.VehicleDetails.VehicleLicenseNumber
+								"th",
+								{ "class": "fw6 bb b--black-20  pa3 " },
+								"Vehicle No."
 							),
 							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								item.MetaData.FormNumber
+								"th",
+								{ "class": "fw6 bb b--black-20  pa3 " },
+								"Form No."
 							),
 							(0, _mithril2.default)(
-								"td",
-								{ "class": "pv3 pr3 bb b--black-20" },
-								(0, _mithril2.default)(
-									"a",
-									{
-										"class": "link bg-green white pv2 ph3 br2 pointer",
-										oncreate: _mithril2.default.route.link,
-										href: "/item/" + item.ID
-									},
-									"view"
-								)
+								"th",
+								{ "class": "fw6 bb b--black-20  pa3 " },
+								"Actions"
 							)
-						);
-					})
+						)
+					),
+					(0, _mithril2.default)(
+						"tbody",
+						{ "class": "lh-copy" },
+						_data.Data.items.map(function (item) {
+							return (0, _mithril2.default)(
+								"tr",
+								null,
+								(0, _mithril2.default)(
+									"td",
+									{ "class": "pv3 pr3 bb b--black-20" },
+									item.ID
+								),
+								(0, _mithril2.default)(
+									"td",
+									{ "class": "pv3 pr3 bb b--black-20" },
+									item.DriversBio.FirstName + " " + item.DriversBio.LastName
+								),
+								(0, _mithril2.default)(
+									"td",
+									{ "class": "pv3 pr3 bb b--black-20" },
+									item.VehicleDetails.RegistrationNumber
+								),
+								(0, _mithril2.default)(
+									"td",
+									{ "class": "pv3 pr3 bb b--black-20" },
+									item.VehicleDetails.VehicleLicenseNumber
+								),
+								(0, _mithril2.default)(
+									"td",
+									{ "class": "pv3 pr3 bb b--black-20" },
+									item.MetaData.FormNumber
+								),
+								(0, _mithril2.default)(
+									"td",
+									{ "class": "pv3 pr3 bb b--black-20" },
+									(0, _mithril2.default)(
+										"a",
+										{
+											"class": "link bg-green white pv2 ph3 br2 pointer",
+											oncreate: _mithril2.default.route.link,
+											href: "/item/" + item.ID
+										},
+										"view"
+									)
+								)
+							);
+						})
+					)
 				)
 			),
 			_data.Data.count.length ? (0, _mithril2.default)(
@@ -6176,14 +6180,14 @@ var NewDriverPage = exports.NewDriverPage = {
 	view: function view() {
 		return (0, _mithril2.default)(
 			"section",
-			{ "class": "tc ph6 " },
+			{ "class": "tc ph6-l ph3-m ph1" },
 			(0, _mithril2.default)(
 				"div",
 				{ "class": "bg-gray cf pa3" },
 				(0, _mithril2.default)(
 					"button",
 					{
-						"class": "fr pv2 ph3 bg-white shadow-4 ",
+						"class": "fr pv2 ph3 bg-white shadow-4 ba b--transparent",
 						onclick: NewDriverPage.ValidateSubmit
 					},
 					"Save"
@@ -6200,7 +6204,7 @@ var NewDriverPage = exports.NewDriverPage = {
 				(0, _mithril2.default)(
 					"button",
 					{
-						"class": "fr pv2 ph3 bg-white shadow-4 ",
+						"class": "fr pv2 ph3 bg-white shadow-4 ba b--transparent",
 						onclick: NewDriverPage.ValidateSubmit
 					},
 					"Save"
@@ -6349,7 +6353,7 @@ var VehicleOwnersBio = exports.VehicleOwnersBio = {
 					{ "class": "tc dib w-100" },
 					(0, _mithril2.default)(_ImageInput.ImageInput, {
 						label: "Owners Passport",
-						"class": " dib w-50 ",
+						"class": " dib w-50-ns w-100 ",
 						Value: _data.Data.data.VehicleOwnersBio.OwnersPassport,
 						Callback: function Callback(v) {
 							return _data.Data.data.VehicleOwnersBio.OwnersPassport = v;
@@ -6863,7 +6867,7 @@ var VehicleDetails = exports.VehicleDetails = {
 					{ "class": "tc dib w-100" },
 					(0, _mithril2.default)(_ImageInput.ImageInput, {
 						label: "Vehicle's Photograph",
-						"class": " dib w-50 ",
+						"class": " dib w-50-ns w-100 ",
 						Value: _data.Data.data.VehicleDetails.PhotographOfVehicle,
 						Callback: function Callback(v) {
 							return _data.Data.data.VehicleDetails.PhotographOfVehicle = v;
@@ -7418,7 +7422,7 @@ var Shell = exports.Shell = {
 				{ "class": "bg-dark-blue white-80 shadow-4 fixed w-100 z-3" },
 				(0, _mithril2.default)(
 					"div",
-					{ "class": "ph5 pa3 cf" },
+					{ "class": "ph5-l ph3-m ph1 pa3 cf" },
 					(0, _mithril2.default)(
 						"a",
 						{ "class": "link dib ph2 pv2 ", oncreate: _mithril2.default.route.link, href: "/" },
@@ -7434,11 +7438,21 @@ var Shell = exports.Shell = {
 						"analytics"
 					),
 					(0, _mithril2.default)(
+						"a",
+						{
+							"class": "bw0 bg-dark-red shadow-4 pv2 ph3 fr br2 white-90 pointer grow link dn-ns",
+							style: "background-color:#5889FF",
+							oncreate: _mithril2.default.route.link,
+							href: "/registration"
+						},
+						"New Registration"
+					),
+					(0, _mithril2.default)(
 						"div",
-						{ "class": "dib pl4" },
+						{ "class": "dib pl4-l pl2 mt2 mt0-ns" },
 						(0, _mithril2.default)(
 							"span",
-							{ "class": " dib ph2 pv2 " },
+							{ "class": "dib pv2" },
 							"search:"
 						),
 						(0, _mithril2.default)(
@@ -7495,7 +7509,7 @@ var Shell = exports.Shell = {
 					),
 					(0, _mithril2.default)(
 						"div",
-						{ "class": "dib fr pv2" },
+						{ "class": "dib-ns dn fr pv2 " },
 						(0, _mithril2.default)(
 							"a",
 							{
@@ -7511,11 +7525,11 @@ var Shell = exports.Shell = {
 			),
 			(0, _mithril2.default)(
 				"section",
-				{ "class": "pa4 tc " },
+				{ "class": "pt4 pb4-ns pb1 ph4-ns ph1 tc " },
 				(0, _mithril2.default)("div", { "class": "pv4" }),
 				(0, _mithril2.default)(
 					"div",
-					{ "class": "dib bb b--gray pa2 pb3" },
+					{ "class": "dib bb b--gray pa3 pb3" },
 					(0, _mithril2.default)(
 						"div",
 						{ "class": "dib pr3" },
@@ -7634,13 +7648,13 @@ var Analytics = {
     view: function view(vnode) {
         return (0, _mithril2.default)(
             "section",
-            { "class": "ph4" },
+            { "class": "ph4-l ph2" },
             (0, _mithril2.default)(
                 "div",
                 { "class": "ph5-ns" },
                 (0, _mithril2.default)(
-                    "h1",
-                    { "class": "black-80 tl" },
+                    "p",
+                    { "class": "black-80 tl f3-ns f4 b" },
                     "TOTAL REGISTERED: ",
                     (0, _mithril2.default)(
                         "span",
@@ -7649,14 +7663,14 @@ var Analytics = {
                     )
                 ),
                 (0, _mithril2.default)(
-                    "h1",
-                    { "class": "black-80 tl" },
+                    "p",
+                    { "class": "black-80 tl f3-ns f4 b" },
                     "TOTAL REGISTERED (WEEK): ",
                     (0, _mithril2.default)("span", { "class": "blue", id: "weekcount" })
                 ),
                 (0, _mithril2.default)(
-                    "h1",
-                    { "class": "black-80 tl" },
+                    "p",
+                    { "class": "black-80 tl f3-ns f4 b" },
                     "TOTAL REGISTERED (TODAY): ",
                     (0, _mithril2.default)("span", { "class": "blue", id: "todaycount" })
                 )
