@@ -2337,7 +2337,7 @@ a.pswp__share--download:hover {
 .ct-series-a .ct-bar, .ct-series-a .ct-line, .ct-series-a .ct-point, .ct-series-a .ct-slice-donut {
     stroke: rgb(71, 126, 135);
     /*fill: rgba(71, 126, 135,.2);*/
-    stroke-width: 2px ;
+    stroke-width: 5px ;
 }
 .ct-series-a .ct-point {
   stroke-width: 8px ;
@@ -2346,7 +2346,7 @@ a.pswp__share--download:hover {
 .ct-series-b .ct-bar, .ct-series-b .ct-line, .ct-series-b .ct-point, .ct-series-b .ct-slice-donut {
     stroke: rgb(224, 0, 21);
     /*fill: rgba(224, 0, 21, .2);*/
-    stroke-width: 2px ;
+    stroke-width: 5px ;
 }
 .ct-series-b .ct-point {
   stroke-width: 8px ;
@@ -2355,7 +2355,7 @@ a.pswp__share--download:hover {
 .ct-series-c .ct-bar, .ct-series-c .ct-line, .ct-series-c .ct-point, .ct-series-c .ct-slice-donut {
     stroke: rgb(0, 0, 0);
     /*fill: rgba(0, 0, 0,.2);*/
-    stroke-width: 2px ;
+    stroke-width: 5px ;
 }
 
 .ct-series-c .ct-point {

@@ -2,6 +2,17 @@ import m from "mithril";
 import { Data } from "../models/data.js";
 
 export var ViewItem = {
+	PrintPage: function() {
+		var prtContent = document.getElementById("printpage");
+		var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=900,toolbar=0,scrollbars=0,status=0');
+		WinPrint.document.write('<link rel="stylesheet" href="/assets/css/main.min.css" media="print"/>')
+		WinPrint.document.write(prtContent.innerHTML);
+		WinPrint.document.close();
+		WinPrint.focus();
+		WinPrint.print();
+		WinPrint.p
+		WinPrint.close();
+	},
 	oncreate: function(vnode) {
 		console.log(vnode.attrs.id);
 		Data.GetOne(vnode.attrs.id);
@@ -77,9 +88,9 @@ export var ViewItem = {
 
 		console.log(Object.entries(VehicleOwnersBio).forEach(([k, v]) => v));
 		return (
-			<section class="tc ph6 pb5 " style="min-height:90vh">
+			<section id="printpage" class="tc ph6 pb5 " style="min-height:90vh">
 				<div class="bg-gray cf pa3">
-					<button class="fr pv2 ph3 bg-white shadow-4 ">Print</button>
+					<button class="fr pv2 ph3 bg-white shadow-4 " onclick={ViewItem.PrintPage}>Print</button>
 				</div>
 				<section class="pv3 cf">
 					<div class="dib  ba pa3 fl" style="width:49%">
@@ -260,7 +271,7 @@ export var ViewItem = {
 					</div>
 				</section>
 				<div class="bg-gray cf pa3">
-					<button class="fr pv2 ph3 bg-white shadow-4 ">Print</button>
+					<button class="fr pv2 ph3 bg-white shadow-4 " onclick={ViewItem.PrintPage}>Print</button>
 				</div>
 			</section>
 		);

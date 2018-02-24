@@ -353,3 +353,51 @@ func SearchByDates(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, items)
 }
+
+func MakeDate(t time.Time) string {
+	_, m, d := t.Date()
+	// strconv.Itoa(y) + "/" +
+	return m.String()[0:3] + "/" + strconv.Itoa(d)
+}
+
+func GetWeekAnalysis(w http.ResponseWriter, r *http.Request) {
+	today := time.Now()
+	baseDate := today.Add(-time.Hour * 24 * 6)
+
+	// label == dates
+	label := []string{
+		MakeDate(today),
+		MakeDate(today.Add(-time.Hour * 24 * 1)),
+		MakeDate(today.Add(-time.Hour * 24 * 2)),
+		MakeDate(today.Add(-time.Hour * 24 * 3)),
+		MakeDate(today.Add(-time.Hour * 24 * 4)),
+		MakeDate(today.Add(-time.Hour * 24 * 5)),
+		MakeDate(today.Add(-time.Hour * 24 * 6)),
+	}
+	// series == counts of registered items
+	counts := [][]int{{0, 0, 0, 0, 0, 0, 0}}
+
+	var items = []Item{}
+	conf := config.Get()
+	err := conf.Storm.Range("CreatedAt", baseDate, today, &items)
+	// err := conf.Storm.All(&items)
+	if err != nil && err.Error() != "not found" {
+		log.Println(err)
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, messages.ErrInternalServer)
+		return
+	}
+	for _, vi := range items {
+		for i, vl := range label {
+			if vl == MakeDate(vi.CreatedAt) {
+				counts[0][i] = counts[0][i] + 1
+			}
+		}
+	}
+	message := struct {
+		Label  []string `json:"labels"`
+		Counts [][]int  `json:"series"`
+	}{label, counts}
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, message)
+}

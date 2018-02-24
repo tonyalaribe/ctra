@@ -5,7 +5,7 @@ import { NewDriverPage } from "./containers/NewDriverPage.js";
 import { ViewItem } from "./containers/ViewItem.js";
 import { Shell } from "./containers/Shell.js";
 import { Data } from "./models/data.js";
-import {Analytics} from "./containers/analytics";
+import Analytics from "./containers/analytics";
 
 var root = document.getElementById("appContainer");
 

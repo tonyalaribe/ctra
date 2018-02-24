@@ -50,6 +50,12 @@ export var Data = {
 			url: "/api/items/count",
 		})
 	},
+	GetWeekAnalysis: function() {
+		return m.request({
+			url: "/api/items/analysis/week",
+			method: "GET"
+		})
+	},
 	Submit: function() {
 		console.log(Data.data);
 		// console.log(JSON.stringify(Data.data));
