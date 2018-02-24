@@ -8,10 +8,11 @@ export var ViewItem = {
 		WinPrint.document.write('<link rel="stylesheet" href="/assets/css/main.min.css" media="print"/>')
 		WinPrint.document.write(prtContent.innerHTML);
 		WinPrint.document.close();
-		WinPrint.focus();
-		WinPrint.print();
-		WinPrint.p
-		WinPrint.close();
+		setTimeout(function() {
+			WinPrint.focus();
+			WinPrint.print();
+			WinPrint.close();
+		}, 2000)
 	},
 	oncreate: function(vnode) {
 		console.log(vnode.attrs.id);
@@ -88,190 +89,201 @@ export var ViewItem = {
 
 		console.log(Object.entries(VehicleOwnersBio).forEach(([k, v]) => v));
 		return (
-			<section id="printpage" class="tc ph6 pb5 " style="min-height:90vh">
+			<section id="printpage" class="tc ph6-l ph3-m ph1 pb5 " style="min-height:90vh">
 				<div class="bg-gray cf pa3">
-					<button class="fr pv2 ph3 bg-white shadow-4 " onclick={ViewItem.PrintPage}>Print</button>
+					<button class="fr pv2 ph3 bg-white shadow-4 ba b--transparent" onclick={ViewItem.PrintPage}>Print</button>
 				</div>
 				<section class="pv3 cf">
-					<div class="dib  ba pa3 fl" style="width:49%">
-						<h3>Vehicle Owner Bio Data</h3>
-						<div>
+					<div class="dib fl-ns w-50-ns pa1" style="">
+						<div class="ba pa3 border-box">
+							<h3>Vehicle Owner Bio Data</h3>
 							<div>
-								<div class="cf tc">
-									<div class=" pa2 tc w-50 dib ">
-										<label class="dib tc">
-											<img
-												src={
-													Data.item.VehicleOwnersBio.OwnersPassport
-														? "/assets/img/uploads/"+Data.item.VehicleOwnersBio.OwnersPassport
-														: "//placehold.it/200x200"
-												}
-												class="w-100 bg-light-gray db h4"
-												alt=""
-												style="min-height:20px"
-											/>
-										</label>
-										<strong class="db f5 ma0 pa2">Owner's Passport</strong>
+								<div>
+									<div class="cf tc">
+										<div class=" pa2 tc w-50 dib ">
+											<label class="dib tc">
+												<img
+													src={
+														Data.item.VehicleOwnersBio.OwnersPassport
+															? "/assets/img/uploads/"+Data.item.VehicleOwnersBio.OwnersPassport
+															: "//placehold.it/200x200"
+													}
+													class="w-100 bg-light-gray db h4"
+													alt=""
+													style="min-height:20px"
+												/>
+											</label>
+											<strong class="db f5 ma0 pa2">Owner's Passport</strong>
+										</div>
 									</div>
 								</div>
+								{Object.entries(VehicleOwnersBio).map(([key, value]) => {
+									return (
+										<div class="cf pv2">
+											<div class="w-30 tl fl pr1">
+												<strong>{key}</strong>
+											</div>
+											<div class="w-70 tl fl">
+												<span class="fw6 ttu lh-copy">{value}</span>
+											</div>
+										</div>
+									);
+								})}
 							</div>
-							{Object.entries(VehicleOwnersBio).map(([key, value]) => {
-								return (
-									<div class="cf pv2">
-										<div class="w-30 tl fl pr1">
-											<strong>{key}</strong>
-										</div>
-										<div class="w-70 tl fl">
-											<span class="fw6 ttu lh-copy">{value}</span>
-										</div>
-									</div>
-								);
-							})}
 						</div>
 					</div>
-					<div class="dib  ba pa3 fr" style="width:49%">
-						<h3>Drivers Bio Data</h3>
-						<div>
+					<div style="page-break-after:always"></div>
+					<div class="dib fr-ns w-50-ns pa1" style="">
+						<div class="ba pa3 border-box">
+							<h3>Drivers Bio Data</h3>
 							<div>
-								<div class="cf">
-									<div class=" pa2 tc w-50 fl">
-										<label class="dib tc">
-											<img
-												src={
-													Data.item.DriversBio.DriversPhotograph
-														? "/assets/img/uploads/"+Data.item.DriversBio.DriversPhotograph
-														: "//placehold.it/200x200"
-												}
-												class="w-100 bg-light-gray db"
-												alt=""
-												style="min-height:20px"
-											/>
-										</label>
-										<strong class="db f5 ma0 pa2">Drivers Photograph</strong>
-									</div>
-									<div class=" pa2 tc w-50 fl ">
-										<label class="dib tc">
-											<img
-												src={
-													Data.item.DriversBio.DriversThumbprint
-														? "/assets/img/uploads/"+Data.item.DriversBio.DriversThumbprint
-														: "//placehold.it/200x200"
-												}
-												class="w-100 bg-light-gray db h4"
-												alt=""
-												style="min-height:20px"
-											/>
-										</label>
-										<strong class="db f5 ma0 pa2">Drivers Thumbprint</strong>
+								<div>
+									<div class="cf">
+										<div class=" pa2 tc w-50 fl">
+											<label class="dib tc">
+												<img
+													src={
+														Data.item.DriversBio.DriversPhotograph
+															? "/assets/img/uploads/"+Data.item.DriversBio.DriversPhotograph
+															: "//placehold.it/200x200"
+													}
+													class="w-100 bg-light-gray db"
+													alt=""
+													style="min-height:20px"
+												/>
+											</label>
+											<strong class="db f5 ma0 pa2">Drivers Photograph</strong>
+										</div>
+										<div class=" pa2 tc w-50 fl ">
+											<label class="dib tc">
+												<img
+													src={
+														Data.item.DriversBio.DriversThumbprint
+															? "/assets/img/uploads/"+Data.item.DriversBio.DriversThumbprint
+															: "//placehold.it/200x200"
+													}
+													class="w-100 bg-light-gray db h4"
+													alt=""
+													style="min-height:20px"
+												/>
+											</label>
+											<strong class="db f5 ma0 pa2">Drivers Thumbprint</strong>
+										</div>
 									</div>
 								</div>
+								{Object.entries(DriversBio).map(([key, value]) => {
+									return (
+										<div class="cf pv2">
+											<div class="w-30 tl fl pr1">
+												<strong>{key}</strong>
+											</div>
+											<div class="w-70 tl fl">
+												<span class="fw6 ttu lh-copy">{value}</span>
+											</div>
+										</div>
+									);
+								})}
 							</div>
-							{Object.entries(DriversBio).map(([key, value]) => {
-								return (
-									<div class="cf pv2">
-										<div class="w-30 tl fl pr1">
-											<strong>{key}</strong>
-										</div>
-										<div class="w-70 tl fl">
-											<span class="fw6 ttu lh-copy">{value}</span>
-										</div>
-									</div>
-								);
-							})}
 						</div>
 					</div>
 				</section>
+				<div style="page-break-after:always"></div>
 				<section class="pv3 cf">
-					<div class="dib  ba pa3 fl" style="width:49%">
-						<h3>Vehicle Particulars</h3>
-						<div>
+					<div class="dib fl-ns w-50-ns pa1" style="">
+						<div class="ba pa3 ">
+							<h3>Vehicle Particulars</h3>
 							<div>
-								<div class="cf tc">
-									<div class=" pa2 tc w-50 dib ">
-										<label class="dib tc">
-											<img
-												src={
-													Data.item.VehicleDetails.PhotographOfVehicle
-														? "/assets/img/uploads/"+Data.item.VehicleDetails.PhotographOfVehicle
-														: "//placehold.it/200x200"
-												}
-												class="w-100 bg-light-gray db h4"
-												alt=""
-												style="min-height:20px"
-											/>
-										</label>
-										<strong class="db f5 ma0 pa2">Photograph of Vehicle</strong>
+								<div>
+									<div class="cf tc">
+										<div class=" pa2 tc w-50 dib ">
+											<label class="dib tc">
+												<img
+													src={
+														Data.item.VehicleDetails.PhotographOfVehicle
+															? "/assets/img/uploads/"+Data.item.VehicleDetails.PhotographOfVehicle
+															: "//placehold.it/200x200"
+													}
+													class="w-100 bg-light-gray db h4"
+													alt=""
+													style="min-height:20px"
+												/>
+											</label>
+											<strong class="db f5 ma0 pa2">Photograph of Vehicle</strong>
+										</div>
 									</div>
 								</div>
+								{Object.entries(VehicleParticulars).map(([key, value]) => {
+									return (
+										<div class="cf pv2">
+											<div class="w-30 tl fl pr1">
+												<strong>{key}</strong>
+											</div>
+											<div class="w-70 tl fl">
+												<span class="fw6 ttu lh-copy">{value}</span>
+											</div>
+										</div>
+									);
+								})}
 							</div>
-							{Object.entries(VehicleParticulars).map(([key, value]) => {
-								return (
-									<div class="cf pv2">
-										<div class="w-30 tl fl pr1">
-											<strong>{key}</strong>
-										</div>
-										<div class="w-70 tl fl">
-											<span class="fw6 ttu lh-copy">{value}</span>
-										</div>
-									</div>
-								);
-							})}
 						</div>
 					</div>
-					<div class="dib  ba pa3 fr" style="width:49%">
-						<h3>Guarantors Bio Data</h3>
-						<div>
+					<div style="page-break-after:always"></div>
+					<div class="dib fr-ns w-50-ns pa1" style="">
+						<div class=" ba pa3 ">
+							<h3>Guarantors Bio Data</h3>
 							<div>
-								<div class="cf">
-									<div class=" pa2 tc w-50 fl">
-										<label class="dib tc">
-											<img
-												src={
-													Data.item.GuarantorsBio.GuarantorsPassport
-														? "/assets/img/uploads/"+Data.item.GuarantorsBio.GuarantorsPassport
-														: "//placehold.it/200x200"
-												}
-												class="w-100 bg-light-gray db"
-												alt=""
-												style="min-height:20px"
-											/>
-										</label>
-										<strong class="db f5 ma0 pa2">Guarantors Passport</strong>
-									</div>
-									<div class=" pa2 tc w-50 fl ">
-										<label class="dib tc">
-											<img
-												src={
-													Data.item.GuarantorsBio.GuarantorsIdentity
-														? "/assets/img/uploads/"+Data.item.GuarantorsBio.GuarantorsIdentity
-														: "//placehold.it/200x200"
-												}
-												class="w-100 bg-light-gray db h4"
-												alt=""
-												style="min-height:20px"
-											/>
-										</label>
-										<strong class="db f5 ma0 pa2">Guarantors Identity</strong>
+								<div>
+									<div class="cf">
+										<div class=" pa2 tc w-50 fl">
+											<label class="dib tc">
+												<img
+													src={
+														Data.item.GuarantorsBio.GuarantorsPassport
+															? "/assets/img/uploads/"+Data.item.GuarantorsBio.GuarantorsPassport
+															: "//placehold.it/200x200"
+													}
+													class="w-100 bg-light-gray db"
+													alt=""
+													style="min-height:20px"
+												/>
+											</label>
+											<strong class="db f5 ma0 pa2">Guarantors Passport</strong>
+										</div>
+										<div class=" pa2 tc w-50 fl ">
+											<label class="dib tc">
+												<img
+													src={
+														Data.item.GuarantorsBio.GuarantorsIdentity
+															? "/assets/img/uploads/"+Data.item.GuarantorsBio.GuarantorsIdentity
+															: "//placehold.it/200x200"
+													}
+													class="w-100 bg-light-gray db h4"
+													alt=""
+													style="min-height:20px"
+												/>
+											</label>
+											<strong class="db f5 ma0 pa2">Guarantors Identity</strong>
+										</div>
 									</div>
 								</div>
+								{Object.entries(GuarantorsBio).map(([key, value]) => {
+									return (
+										<div class="cf pv2">
+											<div class="w-30 tl fl pr1">
+												<strong>{key}</strong>
+											</div>
+											<div class="w-70 tl fl">
+												<span class="fw6 ttu lh-copy">{value}</span>
+											</div>
+										</div>
+									);
+								})}
 							</div>
-							{Object.entries(GuarantorsBio).map(([key, value]) => {
-								return (
-									<div class="cf pv2">
-										<div class="w-30 tl fl pr1">
-											<strong>{key}</strong>
-										</div>
-										<div class="w-70 tl fl">
-											<span class="fw6 ttu lh-copy">{value}</span>
-										</div>
-									</div>
-								);
-							})}
 						</div>
 					</div>
 				</section>
 				<div class="bg-gray cf pa3">
-					<button class="fr pv2 ph3 bg-white shadow-4 " onclick={ViewItem.PrintPage}>Print</button>
+					<button class="fr pv2 ph3 bg-white shadow-4 ba b--transparent" onclick={ViewItem.PrintPage}>Print</button>
 				</div>
 			</section>
 		);

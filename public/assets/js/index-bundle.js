@@ -6950,10 +6950,11 @@ var ViewItem = exports.ViewItem = {
 		WinPrint.document.write('<link rel="stylesheet" href="/assets/css/main.min.css" media="print"/>');
 		WinPrint.document.write(prtContent.innerHTML);
 		WinPrint.document.close();
-		WinPrint.focus();
-		WinPrint.print();
-		WinPrint.p;
-		WinPrint.close();
+		setTimeout(function () {
+			WinPrint.focus();
+			WinPrint.print();
+			WinPrint.close();
+		}, 2000);
 	},
 	oncreate: function oncreate(vnode) {
 		console.log(vnode.attrs.id);
@@ -7037,13 +7038,13 @@ var ViewItem = exports.ViewItem = {
 		}));
 		return (0, _mithril2.default)(
 			"section",
-			{ id: "printpage", "class": "tc ph6 pb5 ", style: "min-height:90vh" },
+			{ id: "printpage", "class": "tc ph6-l ph3-m ph1 pb5 ", style: "min-height:90vh" },
 			(0, _mithril2.default)(
 				"div",
 				{ "class": "bg-gray cf pa3" },
 				(0, _mithril2.default)(
 					"button",
-					{ "class": "fr pv2 ph3 bg-white shadow-4 ", onclick: ViewItem.PrintPage },
+					{ "class": "fr pv2 ph3 bg-white shadow-4 ba b--transparent", onclick: ViewItem.PrintPage },
 					"Print"
 				)
 			),
@@ -7052,316 +7053,335 @@ var ViewItem = exports.ViewItem = {
 				{ "class": "pv3 cf" },
 				(0, _mithril2.default)(
 					"div",
-					{ "class": "dib  ba pa3 fl", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Vehicle Owner Bio Data"
-					),
+					{ "class": "dib fl-ns w-50-ns pa1", style: "" },
 					(0, _mithril2.default)(
 						"div",
-						null,
+						{ "class": "ba pa3 border-box" },
+						(0, _mithril2.default)(
+							"h3",
+							null,
+							"Vehicle Owner Bio Data"
+						),
 						(0, _mithril2.default)(
 							"div",
 							null,
 							(0, _mithril2.default)(
 								"div",
-								{ "class": "cf tc" },
+								null,
 								(0, _mithril2.default)(
 									"div",
-									{ "class": " pa2 tc w-50 dib " },
+									{ "class": "cf tc" },
 									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.VehicleOwnersBio.OwnersPassport ? "/assets/img/uploads/" + _data.Data.item.VehicleOwnersBio.OwnersPassport : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
+										"div",
+										{ "class": " pa2 tc w-50 dib " },
+										(0, _mithril2.default)(
+											"label",
+											{ "class": "dib tc" },
+											(0, _mithril2.default)("img", {
+												src: _data.Data.item.VehicleOwnersBio.OwnersPassport ? "/assets/img/uploads/" + _data.Data.item.VehicleOwnersBio.OwnersPassport : "//placehold.it/200x200",
+												"class": "w-100 bg-light-gray db h4",
+												alt: "",
+												style: "min-height:20px"
+											})
+										),
+										(0, _mithril2.default)(
+											"strong",
+											{ "class": "db f5 ma0 pa2" },
+											"Owner's Passport"
+										)
+									)
+								)
+							),
+							Object.entries(VehicleOwnersBio).map(function (_ref3) {
+								var _ref4 = _slicedToArray(_ref3, 2),
+								    key = _ref4[0],
+								    value = _ref4[1];
+
+								return (0, _mithril2.default)(
+									"div",
+									{ "class": "cf pv2" },
+									(0, _mithril2.default)(
+										"div",
+										{ "class": "w-30 tl fl pr1" },
+										(0, _mithril2.default)(
+											"strong",
+											null,
+											key
+										)
 									),
 									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Owner's Passport"
+										"div",
+										{ "class": "w-70 tl fl" },
+										(0, _mithril2.default)(
+											"span",
+											{ "class": "fw6 ttu lh-copy" },
+											value
+										)
 									)
-								)
-							)
-						),
-						Object.entries(VehicleOwnersBio).map(function (_ref3) {
-							var _ref4 = _slicedToArray(_ref3, 2),
-							    key = _ref4[0],
-							    value = _ref4[1];
-
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-30 tl fl pr1" },
-									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
-									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
-									)
-								)
-							);
-						})
+								);
+							})
+						)
 					)
 				),
+				(0, _mithril2.default)("div", { style: "page-break-after:always" }),
 				(0, _mithril2.default)(
 					"div",
-					{ "class": "dib  ba pa3 fr", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Drivers Bio Data"
-					),
+					{ "class": "dib fr-ns w-50-ns pa1", style: "" },
 					(0, _mithril2.default)(
 						"div",
-						null,
+						{ "class": "ba pa3 border-box" },
+						(0, _mithril2.default)(
+							"h3",
+							null,
+							"Drivers Bio Data"
+						),
 						(0, _mithril2.default)(
 							"div",
 							null,
 							(0, _mithril2.default)(
 								"div",
-								{ "class": "cf" },
+								null,
 								(0, _mithril2.default)(
 									"div",
-									{ "class": " pa2 tc w-50 fl" },
+									{ "class": "cf" },
 									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.DriversBio.DriversPhotograph ? "/assets/img/uploads/" + _data.Data.item.DriversBio.DriversPhotograph : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db",
-											alt: "",
-											style: "min-height:20px"
-										})
+										"div",
+										{ "class": " pa2 tc w-50 fl" },
+										(0, _mithril2.default)(
+											"label",
+											{ "class": "dib tc" },
+											(0, _mithril2.default)("img", {
+												src: _data.Data.item.DriversBio.DriversPhotograph ? "/assets/img/uploads/" + _data.Data.item.DriversBio.DriversPhotograph : "//placehold.it/200x200",
+												"class": "w-100 bg-light-gray db",
+												alt: "",
+												style: "min-height:20px"
+											})
+										),
+										(0, _mithril2.default)(
+											"strong",
+											{ "class": "db f5 ma0 pa2" },
+											"Drivers Photograph"
+										)
 									),
 									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Drivers Photograph"
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 fl " },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.DriversBio.DriversThumbprint ? "/assets/img/uploads/" + _data.Data.item.DriversBio.DriversThumbprint : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Drivers Thumbprint"
+										"div",
+										{ "class": " pa2 tc w-50 fl " },
+										(0, _mithril2.default)(
+											"label",
+											{ "class": "dib tc" },
+											(0, _mithril2.default)("img", {
+												src: _data.Data.item.DriversBio.DriversThumbprint ? "/assets/img/uploads/" + _data.Data.item.DriversBio.DriversThumbprint : "//placehold.it/200x200",
+												"class": "w-100 bg-light-gray db h4",
+												alt: "",
+												style: "min-height:20px"
+											})
+										),
+										(0, _mithril2.default)(
+											"strong",
+											{ "class": "db f5 ma0 pa2" },
+											"Drivers Thumbprint"
+										)
 									)
 								)
-							)
-						),
-						Object.entries(DriversBio).map(function (_ref5) {
-							var _ref6 = _slicedToArray(_ref5, 2),
-							    key = _ref6[0],
-							    value = _ref6[1];
+							),
+							Object.entries(DriversBio).map(function (_ref5) {
+								var _ref6 = _slicedToArray(_ref5, 2),
+								    key = _ref6[0],
+								    value = _ref6[1];
 
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
+								return (0, _mithril2.default)(
 									"div",
-									{ "class": "w-30 tl fl pr1" },
+									{ "class": "cf pv2" },
 									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
+										"div",
+										{ "class": "w-30 tl fl pr1" },
+										(0, _mithril2.default)(
+											"strong",
+											null,
+											key
+										)
+									),
 									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
+										"div",
+										{ "class": "w-70 tl fl" },
+										(0, _mithril2.default)(
+											"span",
+											{ "class": "fw6 ttu lh-copy" },
+											value
+										)
 									)
-								)
-							);
-						})
+								);
+							})
+						)
 					)
 				)
 			),
+			(0, _mithril2.default)("div", { style: "page-break-after:always" }),
 			(0, _mithril2.default)(
 				"section",
 				{ "class": "pv3 cf" },
 				(0, _mithril2.default)(
 					"div",
-					{ "class": "dib  ba pa3 fl", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Vehicle Particulars"
-					),
+					{ "class": "dib fl-ns w-50-ns pa1", style: "" },
 					(0, _mithril2.default)(
 						"div",
-						null,
+						{ "class": "ba pa3 " },
+						(0, _mithril2.default)(
+							"h3",
+							null,
+							"Vehicle Particulars"
+						),
 						(0, _mithril2.default)(
 							"div",
 							null,
 							(0, _mithril2.default)(
 								"div",
-								{ "class": "cf tc" },
+								null,
 								(0, _mithril2.default)(
 									"div",
-									{ "class": " pa2 tc w-50 dib " },
+									{ "class": "cf tc" },
 									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.VehicleDetails.PhotographOfVehicle ? "/assets/img/uploads/" + _data.Data.item.VehicleDetails.PhotographOfVehicle : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
+										"div",
+										{ "class": " pa2 tc w-50 dib " },
+										(0, _mithril2.default)(
+											"label",
+											{ "class": "dib tc" },
+											(0, _mithril2.default)("img", {
+												src: _data.Data.item.VehicleDetails.PhotographOfVehicle ? "/assets/img/uploads/" + _data.Data.item.VehicleDetails.PhotographOfVehicle : "//placehold.it/200x200",
+												"class": "w-100 bg-light-gray db h4",
+												alt: "",
+												style: "min-height:20px"
+											})
+										),
+										(0, _mithril2.default)(
+											"strong",
+											{ "class": "db f5 ma0 pa2" },
+											"Photograph of Vehicle"
+										)
+									)
+								)
+							),
+							Object.entries(VehicleParticulars).map(function (_ref7) {
+								var _ref8 = _slicedToArray(_ref7, 2),
+								    key = _ref8[0],
+								    value = _ref8[1];
+
+								return (0, _mithril2.default)(
+									"div",
+									{ "class": "cf pv2" },
+									(0, _mithril2.default)(
+										"div",
+										{ "class": "w-30 tl fl pr1" },
+										(0, _mithril2.default)(
+											"strong",
+											null,
+											key
+										)
 									),
 									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Photograph of Vehicle"
+										"div",
+										{ "class": "w-70 tl fl" },
+										(0, _mithril2.default)(
+											"span",
+											{ "class": "fw6 ttu lh-copy" },
+											value
+										)
 									)
-								)
-							)
-						),
-						Object.entries(VehicleParticulars).map(function (_ref7) {
-							var _ref8 = _slicedToArray(_ref7, 2),
-							    key = _ref8[0],
-							    value = _ref8[1];
-
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-30 tl fl pr1" },
-									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
-									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
-									)
-								)
-							);
-						})
+								);
+							})
+						)
 					)
 				),
+				(0, _mithril2.default)("div", { style: "page-break-after:always" }),
 				(0, _mithril2.default)(
 					"div",
-					{ "class": "dib  ba pa3 fr", style: "width:49%" },
-					(0, _mithril2.default)(
-						"h3",
-						null,
-						"Guarantors Bio Data"
-					),
+					{ "class": "dib fr-ns w-50-ns pa1", style: "" },
 					(0, _mithril2.default)(
 						"div",
-						null,
+						{ "class": " ba pa3 " },
+						(0, _mithril2.default)(
+							"h3",
+							null,
+							"Guarantors Bio Data"
+						),
 						(0, _mithril2.default)(
 							"div",
 							null,
 							(0, _mithril2.default)(
 								"div",
-								{ "class": "cf" },
+								null,
 								(0, _mithril2.default)(
 									"div",
-									{ "class": " pa2 tc w-50 fl" },
+									{ "class": "cf" },
 									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.GuarantorsBio.GuarantorsPassport ? "/assets/img/uploads/" + _data.Data.item.GuarantorsBio.GuarantorsPassport : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db",
-											alt: "",
-											style: "min-height:20px"
-										})
+										"div",
+										{ "class": " pa2 tc w-50 fl" },
+										(0, _mithril2.default)(
+											"label",
+											{ "class": "dib tc" },
+											(0, _mithril2.default)("img", {
+												src: _data.Data.item.GuarantorsBio.GuarantorsPassport ? "/assets/img/uploads/" + _data.Data.item.GuarantorsBio.GuarantorsPassport : "//placehold.it/200x200",
+												"class": "w-100 bg-light-gray db",
+												alt: "",
+												style: "min-height:20px"
+											})
+										),
+										(0, _mithril2.default)(
+											"strong",
+											{ "class": "db f5 ma0 pa2" },
+											"Guarantors Passport"
+										)
 									),
 									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Guarantors Passport"
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": " pa2 tc w-50 fl " },
-									(0, _mithril2.default)(
-										"label",
-										{ "class": "dib tc" },
-										(0, _mithril2.default)("img", {
-											src: _data.Data.item.GuarantorsBio.GuarantorsIdentity ? "/assets/img/uploads/" + _data.Data.item.GuarantorsBio.GuarantorsIdentity : "//placehold.it/200x200",
-											"class": "w-100 bg-light-gray db h4",
-											alt: "",
-											style: "min-height:20px"
-										})
-									),
-									(0, _mithril2.default)(
-										"strong",
-										{ "class": "db f5 ma0 pa2" },
-										"Guarantors Identity"
+										"div",
+										{ "class": " pa2 tc w-50 fl " },
+										(0, _mithril2.default)(
+											"label",
+											{ "class": "dib tc" },
+											(0, _mithril2.default)("img", {
+												src: _data.Data.item.GuarantorsBio.GuarantorsIdentity ? "/assets/img/uploads/" + _data.Data.item.GuarantorsBio.GuarantorsIdentity : "//placehold.it/200x200",
+												"class": "w-100 bg-light-gray db h4",
+												alt: "",
+												style: "min-height:20px"
+											})
+										),
+										(0, _mithril2.default)(
+											"strong",
+											{ "class": "db f5 ma0 pa2" },
+											"Guarantors Identity"
+										)
 									)
 								)
-							)
-						),
-						Object.entries(GuarantorsBio).map(function (_ref9) {
-							var _ref10 = _slicedToArray(_ref9, 2),
-							    key = _ref10[0],
-							    value = _ref10[1];
+							),
+							Object.entries(GuarantorsBio).map(function (_ref9) {
+								var _ref10 = _slicedToArray(_ref9, 2),
+								    key = _ref10[0],
+								    value = _ref10[1];
 
-							return (0, _mithril2.default)(
-								"div",
-								{ "class": "cf pv2" },
-								(0, _mithril2.default)(
+								return (0, _mithril2.default)(
 									"div",
-									{ "class": "w-30 tl fl pr1" },
+									{ "class": "cf pv2" },
 									(0, _mithril2.default)(
-										"strong",
-										null,
-										key
-									)
-								),
-								(0, _mithril2.default)(
-									"div",
-									{ "class": "w-70 tl fl" },
+										"div",
+										{ "class": "w-30 tl fl pr1" },
+										(0, _mithril2.default)(
+											"strong",
+											null,
+											key
+										)
+									),
 									(0, _mithril2.default)(
-										"span",
-										{ "class": "fw6 ttu lh-copy" },
-										value
+										"div",
+										{ "class": "w-70 tl fl" },
+										(0, _mithril2.default)(
+											"span",
+											{ "class": "fw6 ttu lh-copy" },
+											value
+										)
 									)
-								)
-							);
-						})
+								);
+							})
+						)
 					)
 				)
 			),
@@ -7370,7 +7390,7 @@ var ViewItem = exports.ViewItem = {
 				{ "class": "bg-gray cf pa3" },
 				(0, _mithril2.default)(
 					"button",
-					{ "class": "fr pv2 ph3 bg-white shadow-4 ", onclick: ViewItem.PrintPage },
+					{ "class": "fr pv2 ph3 bg-white shadow-4 ba b--transparent", onclick: ViewItem.PrintPage },
 					"Print"
 				)
 			)
